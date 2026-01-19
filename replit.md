@@ -18,6 +18,12 @@
   - Full recipe modal with detailed ingredients (with amounts) and availability status
   - Ingredient synchronization: user's base ingredients + search ingredients combined
   - Visual indicators: available ingredients (green checkmark) vs missing (grey X)
+- 2026-01-19: Personal Cabinet (Profile Page)
+  - Display user name and email
+  - Edit base ingredients (add custom, toggle predefined)
+  - Edit cooking equipment
+  - Edit food preferences (cuisines and diet types)
+  - Changes saved to Supabase with Zod validation
 
 ## Project Architecture
 
