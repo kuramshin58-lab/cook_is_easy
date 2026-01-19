@@ -68,6 +68,10 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
 - В поле "name" ингредиента указывай только название продукта (без количества)
 - В поле "amount" указывай количество (граммы, штуки, ложки и т.д.)`;
 
+  console.log("\n=== ЗАПРОС В CHATGPT ===");
+  console.log("Промпт:", prompt);
+  console.log("========================\n");
+
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
