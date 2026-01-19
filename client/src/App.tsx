@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import Recipes from "@/pages/Recipes";
 import Login from "@/pages/Login";
 import Onboarding from "@/pages/Onboarding";
+import Profile from "@/pages/Profile";
 
 function AppContent() {
   const { user, logout } = useAuth();
@@ -23,6 +24,7 @@ function AppContent() {
           <Route path="/recipes" component={Recipes} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Onboarding} />
+          <Route path="/profile" component={Profile} />
           <Route component={NotFound} />
         </Switch>
       </main>

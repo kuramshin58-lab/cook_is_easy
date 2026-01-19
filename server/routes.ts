@@ -102,6 +102,37 @@ export async function registerRoutes(
     }
   });
 
+  app.put("/api/auth/profile", async (req, res) => {
+    try {
+      const { userId, base_ingredients, equipment, food_preferences } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      const { data: updatedUser, error } = await supabase
+        .from('users')
+        .update({
+          base_ingredients: base_ingredients || [],
+          equipment: equipment || [],
+          food_preferences: food_preferences || []
+        })
+        .eq('id', userId)
+        .select('id, name, email, base_ingredients, equipment, food_preferences')
+        .single();
+
+      if (error) {
+        console.error("Supabase update error:", error);
+        return res.status(500).json({ error: "Ошибка при обновлении профиля" });
+      }
+
+      return res.json({ user: updatedUser });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      return res.status(500).json({ error: "Ошибка сервера" });
+    }
+  });
+
   app.post("/api/recipes/generate", async (req, res) => {
     try {
       const validationResult = recipeRequestSchema.safeParse(req.body);
