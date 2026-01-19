@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IngredientInput } from "@/components/IngredientInput";
 import { FilterButtons } from "@/components/FilterButtons";
-import { ChefHat, Sparkles, UtensilsCrossed } from "lucide-react";
+import { ChefHat, Sparkles, UtensilsCrossed, Clock, Heart, Utensils, ShoppingBag, ArrowRight, Check } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { 
   cookingTimeOptions, 
@@ -16,7 +16,162 @@ import {
   type RecipeRequest
 } from "@shared/schema";
 
-export default function Home() {
+function Landing() {
+  const [, setLocation] = useLocation();
+
+  const features = [
+    {
+      icon: ShoppingBag,
+      title: "Из того, что есть",
+      description: "Введите продукты из холодильника — получите рецепты без лишних покупок"
+    },
+    {
+      icon: Heart,
+      title: "Персональный подход",
+      description: "Учитываем ваши предпочтения, оборудование и любимые кухни мира"
+    },
+    {
+      icon: Clock,
+      title: "Экономия времени",
+      description: "Выберите время готовки — от 20 минут для быстрого ужина до часа для праздничного стола"
+    },
+    {
+      icon: Utensils,
+      title: "5 уникальных рецептов",
+      description: "AI подберёт разнообразные блюда с пошаговыми инструкциями"
+    }
+  ];
+
+  const benefits = [
+    "Не нужно думать, что приготовить",
+    "Рецепты из имеющихся продуктов",
+    "Персонализация под ваши вкусы",
+    "Подробные пошаговые инструкции",
+    "Список недостающих ингредиентов"
+  ];
+
+  return (
+    <div className="bg-background">
+      <section className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
+            <ChefHat className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4" data-testid="text-landing-title">
+            Что приготовить сегодня?
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            Введите продукты, которые у вас есть, и искусственный интеллект 
+            подберёт 5 уникальных рецептов специально для вас
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="gap-2"
+              onClick={() => setLocation("/register")}
+              data-testid="button-start-free"
+            >
+              Начать бесплатно
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => setLocation("/login")}
+              data-testid="button-login-landing"
+            >
+              У меня есть аккаунт
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-muted/30 py-12 md:py-16">
+        <div className="container max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
+            Как это работает
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <Card key={index} className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex gap-4">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <feature.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1" data-testid={`text-feature-title-${index}`}>
+                        {feature.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12 md:py-16">
+        <div className="container max-w-4xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row gap-8 items-center">
+            <div className="flex-1">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6">
+                Преимущества сервиса
+              </h2>
+              <ul className="space-y-3">
+                {benefits.map((benefit, index) => (
+                  <li key={index} className="flex items-center gap-3">
+                    <div className="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="h-4 w-4 text-primary" />
+                    </div>
+                    <span data-testid={`text-benefit-${index}`}>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex-1">
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-6 text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">5</div>
+                  <div className="text-lg font-medium mb-1">уникальных рецептов</div>
+                  <p className="text-sm text-muted-foreground">
+                    за каждый запрос — с учётом ваших предпочтений и доступных продуктов
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-muted/30 py-12 md:py-16">
+        <div className="container max-w-2xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            Готовы начать?
+          </h2>
+          <p className="text-muted-foreground mb-8">
+            Зарегистрируйтесь за минуту и получите персональные рецепты уже сегодня
+          </p>
+          <Button 
+            size="lg" 
+            className="gap-2"
+            onClick={() => setLocation("/register")}
+            data-testid="button-register-bottom"
+          >
+            <Sparkles className="h-4 w-4" />
+            Создать аккаунт
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function RecipeGenerator() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -49,7 +204,6 @@ export default function Home() {
       } : undefined
     };
 
-    // Объединяем все продукты пользователя: введённые + базовые из профиля
     const combinedIngredients = user 
       ? [...ingredients, ...user.base_ingredients]
       : ingredients;
@@ -69,14 +223,11 @@ export default function Home() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
             <ChefHat className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2" data-testid="text-generator-title">
             Приготовим то, что есть в холодильнике
           </h1>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            {user 
-              ? `${user.name}, введите продукты и получите персональные рецепты!`
-              : "Введите продукты, которые у вас есть, и получите 5 уникальных рецептов"
-            }
+            {user?.name}, введите продукты и получите персональные рецепты!
           </p>
         </header>
 
@@ -148,4 +299,18 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export default function Home() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return user ? <RecipeGenerator /> : <Landing />;
 }
