@@ -4,7 +4,7 @@ import { recipeResponseSchema, type RecipeRequest, type Recipe } from "@shared/s
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]> {
-  const { ingredients, cookingTime, cookingMethod, foodType } = request;
+  const { ingredients, cookingTime, cookingMethod, foodType, userPreferences } = request;
 
   const ingredientsList = ingredients.join(", ");
   
@@ -27,6 +27,20 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
     }
   }
 
+  if (userPreferences) {
+    if (userPreferences.baseIngredients && userPreferences.baseIngredients.length > 0) {
+      prompt += `\n\nУ пользователя всегда есть базовые продукты: ${userPreferences.baseIngredients.join(", ")}. Можешь использовать их в рецептах.`;
+    }
+    
+    if (userPreferences.equipment && userPreferences.equipment.length > 0) {
+      prompt += `\n\nДоступное оборудование для готовки: ${userPreferences.equipment.join(", ")}. Учитывай это при составлении рецептов.`;
+    }
+    
+    if (userPreferences.foodPreferences && userPreferences.foodPreferences.length > 0) {
+      prompt += `\n\nПредпочтения пользователя в еде: ${userPreferences.foodPreferences.join(", ")}. Постарайся учесть эти предпочтения.`;
+    }
+  }
+
   prompt += `
 
 Ответ должен быть в формате JSON:
@@ -44,7 +58,7 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
 }
 
 Важно:
-- Используй только указанные ингредиенты и базовые продукты (соль, перец, масло, вода)
+- Используй указанные ингредиенты и базовые продукты пользователя
 - Каждый рецепт должен быть уникальным
 - Шаги должны быть понятными и подробными
 - Укажи точное время приготовления в минутах`;

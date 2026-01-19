@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { IngredientInput } from "@/components/IngredientInput";
 import { FilterButtons } from "@/components/FilterButtons";
 import { ChefHat, Sparkles, UtensilsCrossed } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import { 
   cookingTimeOptions, 
   cookingMethodOptions, 
@@ -17,6 +18,7 @@ import {
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [cookingTime, setCookingTime] = useState<CookingTime>("40");
   const [cookingMethod, setCookingMethod] = useState<CookingMethod | undefined>();
@@ -39,7 +41,12 @@ export default function Home() {
       ingredients,
       cookingTime,
       cookingMethod,
-      foodType
+      foodType,
+      userPreferences: user ? {
+        baseIngredients: user.base_ingredients,
+        equipment: user.equipment,
+        foodPreferences: user.food_preferences
+      } : undefined
     };
 
     sessionStorage.setItem("recipeRequest", JSON.stringify(request));
@@ -49,7 +56,7 @@ export default function Home() {
   const formatCookingTime = (time: CookingTime) => `${time} мин`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="container max-w-2xl mx-auto px-4 py-8 md:py-12">
         <header className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
@@ -59,8 +66,10 @@ export default function Home() {
             Приготовим то, что есть в холодильнике
           </h1>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            Введите продукты, которые у вас есть, и получите 5 уникальных рецептов, 
-            подобранных специально для вас
+            {user 
+              ? `${user.name}, введите продукты и получите персональные рецепты!`
+              : "Введите продукты, которые у вас есть, и получите 5 уникальных рецептов"
+            }
           </p>
         </header>
 

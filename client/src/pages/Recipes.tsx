@@ -32,7 +32,7 @@ export default function Recipes() {
   const recipes: Recipe[] = generateRecipes.data?.recipes || [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="container max-w-3xl mx-auto px-4 py-8 md:py-12">
         <header className="mb-8">
           <Button
