@@ -143,6 +143,15 @@ export const recipeResponseSchema = z.object({
 
 export type RecipeResponse = z.infer<typeof recipeResponseSchema>;
 
+export const updateProfileSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  base_ingredients: z.array(z.string()).default([]),
+  equipment: z.array(z.string()).default([]),
+  food_preferences: z.array(z.string()).default([])
+});
+
+export type UpdateProfile = z.infer<typeof updateProfileSchema>;
+
 export const popularIngredients = [
   // Курица и птица
   "Курица",
