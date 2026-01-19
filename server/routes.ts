@@ -49,8 +49,12 @@ export async function registerRoutes(
         .single();
 
       if (error) {
-        console.error("Supabase error:", error);
-        return res.status(500).json({ error: "Ошибка при создании пользователя" });
+        console.error("Supabase insert error:", error);
+        console.error("Error details:", JSON.stringify(error, null, 2));
+        return res.status(500).json({ 
+          error: "Ошибка при создании пользователя",
+          details: error.message || "Unknown error"
+        });
       }
 
       return res.json({ user: newUser });
