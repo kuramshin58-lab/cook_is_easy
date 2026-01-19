@@ -118,11 +118,19 @@ export const recipeRequestSchema = z.object({
 
 export type RecipeRequest = z.infer<typeof recipeRequestSchema>;
 
+export const ingredientSchema = z.object({
+  name: z.string(),
+  amount: z.string()
+});
+
+export type Ingredient = z.infer<typeof ingredientSchema>;
+
 export const recipeSchema = z.object({
   title: z.string(),
+  shortDescription: z.string(),
   description: z.string(),
   cookingTime: z.string(),
-  ingredients: z.array(z.string()),
+  ingredients: z.array(ingredientSchema),
   steps: z.array(z.string()),
   tips: z.string().optional(),
 });
