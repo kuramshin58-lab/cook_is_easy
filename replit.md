@@ -30,6 +30,14 @@
   - Benefits list with checkmarks
   - CTA buttons: "Начать бесплатно" → /register, "У меня есть аккаунт" → /login
   - Recipe generator only available after login
+- 2026-01-19: UX/UI Redesign (modern clean style)
+  - Card-based category selection with icons for cooking time and method
+  - Pill-style badges for food type selection
+  - User greeting with avatar on authenticated home
+  - Onboarding: progress bar, visual step indicators, equipment as card grid
+  - Recipe preview cards: soft shadows, match percentage indicator, gradient progress bar
+  - Recipe detail modal: КБЖУ (calories/protein/fats/carbs) in colored cards
+  - Updated OpenAI prompt to generate nutritional information
 
 ## Project Architecture
 
