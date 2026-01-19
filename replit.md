@@ -24,6 +24,12 @@
   - Edit cooking equipment
   - Edit food preferences (cuisines and diet types)
   - Changes saved to Supabase with Zod validation
+- 2026-01-19: Landing Page for Unauthenticated Users
+  - Hero section with value proposition
+  - Features section (4 cards): ingredients usage, personalization, time saving, AI recipes
+  - Benefits list with checkmarks
+  - CTA buttons: "Начать бесплатно" → /register, "У меня есть аккаунт" → /login
+  - Recipe generator only available after login
 
 ## Project Architecture
 
