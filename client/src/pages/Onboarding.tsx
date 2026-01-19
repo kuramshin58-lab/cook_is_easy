@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ChefHat, ArrowRight, ArrowLeft, Sparkles, Check } from "lucide-react";
+import { ChefHat, ArrowRight, ArrowLeft, Sparkles, Check, Utensils, ShoppingBag, Heart } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -109,216 +109,244 @@ export default function Onboarding() {
   const progress = (step / 5) * 100;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
-            <ChefHat className="h-6 w-6 text-primary" />
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Progress value={progress} className="h-1.5 mb-4" />
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-sm text-muted-foreground">Шаг {step} из 5</span>
+              {step > 1 && (
+                <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} className="text-muted-foreground">
+                  Пропустить
+                </Button>
+              )}
+            </div>
           </div>
-          <Progress value={progress} className="h-2" />
-          <p className="text-sm text-muted-foreground mt-2">Шаг {step} из 5</p>
-        </div>
 
-        <Card>
           {step === 1 && (
-            <>
-              <CardHeader className="text-center">
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Добро пожаловать!
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Мы поможем вам готовить вкусные блюда из того, что есть дома
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                  <p className="text-sm">
-                    Чтобы подбирать рецепты максимально точно, нам нужно узнать немного о вас:
-                  </p>
-                  <ul className="text-sm space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <Check className="h-4 w-4 text-primary mt-0.5" />
-                      Какие базовые продукты у вас всегда есть
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="h-4 w-4 text-primary mt-0.5" />
-                      Какое оборудование для готовки доступно
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="h-4 w-4 text-primary mt-0.5" />
-                      Ваши предпочтения в еде
-                    </li>
-                  </ul>
-                </div>
-                <p className="text-sm text-center text-muted-foreground">
-                  Это займет всего пару минут, и мы будем подбирать рецепты специально для вас!
+            <div className="text-center space-y-6">
+              <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <ChefHat className="h-10 w-10 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold mb-2">Добро пожаловать!</h1>
+                <p className="text-muted-foreground">
+                  Настроим персональные рецепты под ваши предпочтения
                 </p>
-              </CardContent>
-            </>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mt-8">
+                <Card className="p-4 text-center border-0 shadow-sm">
+                  <ShoppingBag className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <p className="text-xs text-muted-foreground">Базовые продукты</p>
+                </Card>
+                <Card className="p-4 text-center border-0 shadow-sm">
+                  <Utensils className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <p className="text-xs text-muted-foreground">Оборудование</p>
+                </Card>
+                <Card className="p-4 text-center border-0 shadow-sm">
+                  <Heart className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <p className="text-xs text-muted-foreground">Вкусы</p>
+                </Card>
+              </div>
+            </div>
           )}
 
           {step === 2 && (
-            <>
-              <CardHeader>
-                <CardTitle>Базовые продукты</CardTitle>
-                <CardDescription>
-                  Что из этого у вас обычно есть дома? Эти продукты мы не будем спрашивать каждый раз
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {baseIngredientsOptions.map((item) => (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold mb-2">Базовые продукты</h1>
+                <p className="text-muted-foreground text-sm">
+                  Что обычно есть у вас дома?
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {baseIngredientsOptions.map((item) => {
+                  const isSelected = baseIngredients.includes(item);
+                  return (
                     <Badge
                       key={item}
-                      variant={baseIngredients.includes(item) ? "default" : "outline"}
-                      className="cursor-pointer text-sm py-1.5 px-3"
+                      variant="outline"
                       onClick={() => toggleItem(item, baseIngredients, setBaseIngredients)}
+                      className={`cursor-pointer py-2 px-4 text-sm transition-all ${
+                        isSelected 
+                          ? "bg-primary text-primary-foreground border-primary" 
+                          : "hover:bg-muted"
+                      }`}
                       data-testid={`badge-ingredient-${item}`}
                     >
-                      {baseIngredients.includes(item) && <Check className="h-3 w-3 mr-1" />}
+                      {isSelected && <Check className="h-3 w-3 mr-1" />}
                       {item}
                     </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </>
+                  );
+                })}
+              </div>
+            </div>
           )}
 
           {step === 3 && (
-            <>
-              <CardHeader>
-                <CardTitle>Оборудование для готовки</CardTitle>
-                <CardDescription>
-                  Выберите, что у вас есть для приготовления блюд
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {equipmentOptions.map((item) => (
-                    <Badge
+            <div className="space-y-6">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold mb-2">Оборудование</h1>
+                <p className="text-muted-foreground text-sm">
+                  Что у вас есть для готовки?
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {equipmentOptions.map((item) => {
+                  const isSelected = equipment.includes(item);
+                  return (
+                    <Card
                       key={item}
-                      variant={equipment.includes(item) ? "default" : "outline"}
-                      className="cursor-pointer text-sm py-1.5 px-3"
                       onClick={() => toggleItem(item, equipment, setEquipment)}
+                      className={`cursor-pointer p-4 text-center transition-all border-2 ${
+                        isSelected 
+                          ? "border-primary bg-primary/5" 
+                          : "border-transparent hover:border-muted"
+                      }`}
                       data-testid={`badge-equipment-${item}`}
                     >
-                      {equipment.includes(item) && <Check className="h-3 w-3 mr-1" />}
-                      {item}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </>
+                      <span className={`text-sm font-medium ${isSelected ? "text-primary" : ""}`}>
+                        {isSelected && <Check className="h-3 w-3 inline mr-1" />}
+                        {item}
+                      </span>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
           )}
 
           {step === 4 && (
-            <>
-              <CardHeader>
-                <CardTitle>Предпочтения в еде</CardTitle>
-                <CardDescription>
-                  Какую кухню и тип питания вы предпочитаете?
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold mb-2">Предпочтения</h1>
+                <p className="text-muted-foreground text-sm">
+                  Какую еду вы любите?
+                </p>
+              </div>
+              <div className="space-y-4">
                 <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block">Тип кухни</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Кухня</Label>
                   <div className="flex flex-wrap gap-2">
-                    {cuisinePreferencesOptions.map((item) => (
-                      <Badge
-                        key={item}
-                        variant={foodPreferences.includes(item) ? "default" : "outline"}
-                        className="cursor-pointer text-sm py-1.5 px-3"
-                        onClick={() => toggleItem(item, foodPreferences, setFoodPreferences)}
-                        data-testid={`badge-cuisine-${item}`}
-                      >
-                        {foodPreferences.includes(item) && <Check className="h-3 w-3 mr-1" />}
-                        {item}
-                      </Badge>
-                    ))}
+                    {cuisinePreferencesOptions.map((item) => {
+                      const isSelected = foodPreferences.includes(item);
+                      return (
+                        <Badge
+                          key={item}
+                          variant="outline"
+                          onClick={() => toggleItem(item, foodPreferences, setFoodPreferences)}
+                          className={`cursor-pointer py-2 px-3 text-sm transition-all ${
+                            isSelected 
+                              ? "bg-primary text-primary-foreground border-primary" 
+                              : "hover:bg-muted"
+                          }`}
+                          data-testid={`badge-cuisine-${item}`}
+                        >
+                          {isSelected && <Check className="h-3 w-3 mr-1" />}
+                          {item}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block">Тип питания</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Тип питания</Label>
                   <div className="flex flex-wrap gap-2">
-                    {dietPreferencesOptions.map((item) => (
-                      <Badge
-                        key={item}
-                        variant={foodPreferences.includes(item) ? "default" : "outline"}
-                        className="cursor-pointer text-sm py-1.5 px-3"
-                        onClick={() => toggleItem(item, foodPreferences, setFoodPreferences)}
-                        data-testid={`badge-diet-${item}`}
-                      >
-                        {foodPreferences.includes(item) && <Check className="h-3 w-3 mr-1" />}
-                        {item}
-                      </Badge>
-                    ))}
+                    {dietPreferencesOptions.map((item) => {
+                      const isSelected = foodPreferences.includes(item);
+                      return (
+                        <Badge
+                          key={item}
+                          variant="outline"
+                          onClick={() => toggleItem(item, foodPreferences, setFoodPreferences)}
+                          className={`cursor-pointer py-2 px-3 text-sm transition-all ${
+                            isSelected 
+                              ? "bg-primary text-primary-foreground border-primary" 
+                              : "hover:bg-muted"
+                          }`}
+                          data-testid={`badge-diet-${item}`}
+                        >
+                          {isSelected && <Check className="h-3 w-3 mr-1" />}
+                          {item}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
-              </CardContent>
-            </>
+              </div>
+            </div>
           )}
 
           {step === 5 && (
-            <>
-              <CardHeader>
-                <CardTitle>Создайте аккаунт</CardTitle>
-                <CardDescription>
-                  Последний шаг — введите ваши данные для входа
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Имя</Label>
-                  <Input
-                    id="name"
-                    placeholder="Как вас зовут?"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    data-testid="input-name"
-                  />
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Sparkles className="h-8 w-8 text-primary" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    data-testid="input-email"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Пароль</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Минимум 6 символов"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    data-testid="input-password"
-                  />
-                </div>
-              </CardContent>
-            </>
+                <h1 className="text-2xl font-bold mb-2">Создайте аккаунт</h1>
+                <p className="text-muted-foreground text-sm">
+                  Последний шаг к персональным рецептам
+                </p>
+              </div>
+              <Card className="p-6 border-0 shadow-md">
+                <CardContent className="p-0 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm">Имя</Label>
+                    <Input
+                      id="name"
+                      placeholder="Как вас зовут?"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="h-12"
+                      data-testid="input-name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-12"
+                      data-testid="input-email"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm">Пароль</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Минимум 6 символов"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-12"
+                      data-testid="input-password"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
-          <div className="p-6 pt-0 flex gap-3">
+          <div className="flex gap-3 mt-8">
             {step > 1 && (
               <Button
                 variant="outline"
+                size="lg"
                 onClick={handleBack}
                 className="gap-2"
                 data-testid="button-back"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Назад
               </Button>
             )}
             {step < 5 ? (
               <Button
                 onClick={handleNext}
+                size="lg"
                 className="flex-1 gap-2"
                 data-testid="button-next"
               >
@@ -328,6 +356,7 @@ export default function Onboarding() {
             ) : (
               <Button
                 onClick={handleSubmit}
+                size="lg"
                 className="flex-1 gap-2"
                 disabled={registerMutation.isPending}
                 data-testid="button-register"
@@ -336,19 +365,19 @@ export default function Onboarding() {
               </Button>
             )}
           </div>
-        </Card>
 
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Уже есть аккаунт?{" "}
-          <Button
-            variant="ghost"
-            className="p-0 h-auto underline"
-            onClick={() => setLocation("/login")}
-            data-testid="link-login"
-          >
-            Войти
-          </Button>
-        </p>
+          <p className="text-center text-sm text-muted-foreground mt-6">
+            Уже есть аккаунт?{" "}
+            <Button
+              variant="ghost"
+              className="p-0 h-auto underline"
+              onClick={() => setLocation("/login")}
+              data-testid="link-login"
+            >
+              Войти
+            </Button>
+          </p>
+        </div>
       </div>
     </div>
   );

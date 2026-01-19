@@ -1,10 +1,26 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { IngredientInput } from "@/components/IngredientInput";
-import { FilterButtons } from "@/components/FilterButtons";
-import { ChefHat, Sparkles, UtensilsCrossed, Clock, Heart, Utensils, ShoppingBag, ArrowRight, Check } from "lucide-react";
+import { 
+  ChefHat, 
+  Sparkles, 
+  Clock, 
+  Heart, 
+  Utensils, 
+  ShoppingBag, 
+  ArrowRight, 
+  Check,
+  Flame,
+  Salad,
+  Soup,
+  Timer,
+  CookingPot,
+  Microwave,
+  Search
+} from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { 
   cookingTimeOptions, 
@@ -23,22 +39,22 @@ function Landing() {
     {
       icon: ShoppingBag,
       title: "Из того, что есть",
-      description: "Введите продукты из холодильника — получите рецепты без лишних покупок"
+      description: "Рецепты из продуктов в холодильнике"
     },
     {
       icon: Heart,
-      title: "Персональный подход",
-      description: "Учитываем ваши предпочтения, оборудование и любимые кухни мира"
+      title: "Персонализация",
+      description: "Учитываем ваши вкусы и предпочтения"
     },
     {
       icon: Clock,
       title: "Экономия времени",
-      description: "Выберите время готовки — от 20 минут для быстрого ужина до часа для праздничного стола"
+      description: "Выбирайте время готовки"
     },
     {
       icon: Utensils,
-      title: "5 уникальных рецептов",
-      description: "AI подберёт разнообразные блюда с пошаговыми инструкциями"
+      title: "5 рецептов",
+      description: "Уникальные рецепты от AI"
     }
   ];
 
@@ -51,7 +67,7 @@ function Landing() {
   ];
 
   return (
-    <div className="bg-background">
+    <div className="min-h-screen bg-background">
       <section className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
@@ -61,8 +77,7 @@ function Landing() {
             Что приготовить сегодня?
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Введите продукты, которые у вас есть, и искусственный интеллект 
-            подберёт 5 уникальных рецептов специально для вас
+            Введите продукты, которые у вас есть, и AI подберёт 5 уникальных рецептов
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -91,23 +106,19 @@ function Landing() {
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
             Как это работает
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <feature.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1" data-testid={`text-feature-title-${index}`}>
-                        {feature.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm">
-                        {feature.description}
-                      </p>
-                    </div>
+              <Card key={index} className="border-0 shadow-md hover-elevate cursor-default">
+                <CardContent className="p-5 text-center">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
+                    <feature.icon className="h-7 w-7 text-primary" />
                   </div>
+                  <h3 className="font-semibold text-sm mb-1" data-testid={`text-feature-title-${index}`}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground text-xs">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -120,7 +131,7 @@ function Landing() {
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="flex-1">
               <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                Преимущества сервиса
+                Преимущества
               </h2>
               <ul className="space-y-3">
                 {benefits.map((benefit, index) => (
@@ -128,18 +139,18 @@ function Landing() {
                     <div className="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
                       <Check className="h-4 w-4 text-primary" />
                     </div>
-                    <span data-testid={`text-benefit-${index}`}>{benefit}</span>
+                    <span className="text-sm" data-testid={`text-benefit-${index}`}>{benefit}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="flex-1">
-              <Card className="bg-primary/5 border-primary/20">
+              <Card className="bg-primary/5 border-primary/20 shadow-lg">
                 <CardContent className="p-6 text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">5</div>
+                  <div className="text-5xl font-bold text-primary mb-2">5</div>
                   <div className="text-lg font-medium mb-1">уникальных рецептов</div>
                   <p className="text-sm text-muted-foreground">
-                    за каждый запрос — с учётом ваших предпочтений и доступных продуктов
+                    за каждый запрос с учётом ваших предпочтений
                   </p>
                 </CardContent>
               </Card>
@@ -148,13 +159,13 @@ function Landing() {
         </div>
       </section>
 
-      <section className="bg-muted/30 py-12 md:py-16">
+      <section className="bg-primary/5 py-12 md:py-16">
         <div className="container max-w-2xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Готовы начать?
           </h2>
           <p className="text-muted-foreground mb-8">
-            Зарегистрируйтесь за минуту и получите персональные рецепты уже сегодня
+            Зарегистрируйтесь за минуту и получите персональные рецепты
           </p>
           <Button 
             size="lg" 
@@ -170,6 +181,28 @@ function Landing() {
     </div>
   );
 }
+
+const cookingTimeLabels: Record<CookingTime, { label: string; icon: typeof Timer }> = {
+  "20": { label: "20 мин", icon: Timer },
+  "40": { label: "40 мин", icon: Timer },
+  "60": { label: "1 час", icon: Clock },
+};
+
+const cookingMethodLabels: Record<CookingMethod, { label: string; icon: typeof Flame }> = {
+  "Варка": { label: "Варка", icon: Soup },
+  "Жарка": { label: "Жарка", icon: Flame },
+  "Запекание": { label: "Запекание", icon: CookingPot },
+  "Тушение": { label: "Тушение", icon: CookingPot },
+  "На пару": { label: "На пару", icon: Soup },
+  "Гриль": { label: "Гриль", icon: Flame },
+  "Без готовки": { label: "Без готовки", icon: Salad },
+};
+
+const foodTypeLabels: Record<FoodType, { label: string; color: string }> = {
+  "ПП": { label: "ПП", color: "bg-green-100 text-green-700 border-green-200" },
+  "Обычная": { label: "Обычная", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  "Жирная": { label: "Жирная", color: "bg-orange-100 text-orange-700 border-orange-200" },
+};
 
 function RecipeGenerator() {
   const [, setLocation] = useLocation();
@@ -214,88 +247,135 @@ function RecipeGenerator() {
     setLocation("/recipes");
   };
 
-  const formatCookingTime = (time: CookingTime) => `${time} мин`;
-
   return (
-    <div className="bg-background">
-      <div className="container max-w-2xl mx-auto px-4 py-8 md:py-12">
-        <header className="text-center mb-8 md:mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <ChefHat className="h-8 w-8 text-primary" />
+    <div className="min-h-screen bg-background">
+      <div className="container max-w-lg mx-auto px-4 py-6">
+        <header className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <span className="text-lg font-semibold text-primary">
+              {user?.name?.charAt(0).toUpperCase() || "U"}
+            </span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2" data-testid="text-generator-title">
-            Приготовим то, что есть в холодильнике
-          </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            {user?.name}, введите продукты и получите персональные рецепты!
-          </p>
+          <div>
+            <p className="text-sm text-muted-foreground">Привет,</p>
+            <p className="font-semibold">{user?.name || "Гость"}</p>
+          </div>
         </header>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Ваши продукты</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <IngredientInput
-                selectedIngredients={ingredients}
-                onAdd={handleAddIngredient}
-                onRemove={handleRemoveIngredient}
-              />
-            </CardContent>
-          </Card>
+        <h1 className="text-2xl md:text-3xl font-bold mb-6" data-testid="text-generator-title">
+          Что готовим сегодня?
+        </h1>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Параметры приготовления</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <FilterButtons
-                label="Время на готовку"
-                options={cookingTimeOptions}
-                selected={cookingTime}
-                onSelect={(v) => setCookingTime(v || "40")}
-                formatOption={formatCookingTime}
-              />
-
-              <FilterButtons
-                label="Тип приготовления"
-                options={cookingMethodOptions}
-                selected={cookingMethod}
-                onSelect={setCookingMethod}
-              />
-
-              <FilterButtons
-                label="Тип еды"
-                options={foodTypeOptions}
-                selected={foodType}
-                onSelect={setFoodType}
-              />
-            </CardContent>
-          </Card>
-
-          <Button
-            size="lg"
-            className="w-full gap-2"
-            onClick={handleSubmit}
-            disabled={ingredients.length === 0}
-            data-testid="button-generate"
-          >
-            <Sparkles className="h-4 w-4" />
-            Показать рецепты
-          </Button>
-
-          {ingredients.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-                <UtensilsCrossed className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Добавьте хотя бы один продукт, чтобы получить рецепты
-              </p>
-            </div>
-          )}
+        <div className="relative mb-6">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <div className="pl-12">
+            <IngredientInput
+              selectedIngredients={ingredients}
+              onAdd={handleAddIngredient}
+              onRemove={handleRemoveIngredient}
+            />
+          </div>
         </div>
+
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted-foreground mb-3">Время готовки</p>
+          <div className="grid grid-cols-3 gap-3">
+            {cookingTimeOptions.map((time) => {
+              const config = cookingTimeLabels[time];
+              const isSelected = cookingTime === time;
+              return (
+                <Card 
+                  key={time}
+                  onClick={() => setCookingTime(time)}
+                  className={`cursor-pointer transition-all border-2 shadow-sm hover-elevate ${
+                    isSelected 
+                      ? "border-primary bg-primary/5" 
+                      : "border-transparent hover:border-muted"
+                  }`}
+                  data-testid={`button-time-${time}`}
+                >
+                  <CardContent className="p-4 text-center">
+                    <config.icon className={`h-6 w-6 mx-auto mb-2 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className={`text-sm font-medium ${isSelected ? "text-primary" : ""}`}>
+                      {config.label}
+                    </span>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted-foreground mb-3">Способ приготовления</p>
+          <div className="grid grid-cols-3 gap-3">
+            {cookingMethodOptions.map((method) => {
+              const config = cookingMethodLabels[method];
+              const isSelected = cookingMethod === method;
+              return (
+                <Card 
+                  key={method}
+                  onClick={() => setCookingMethod(isSelected ? undefined : method)}
+                  className={`cursor-pointer transition-all border-2 shadow-sm hover-elevate ${
+                    isSelected 
+                      ? "border-primary bg-primary/5" 
+                      : "border-transparent hover:border-muted"
+                  }`}
+                  data-testid={`button-method-${method}`}
+                >
+                  <CardContent className="p-3 text-center">
+                    <config.icon className={`h-5 w-5 mx-auto mb-1 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className={`text-xs font-medium ${isSelected ? "text-primary" : ""}`}>
+                      {config.label}
+                    </span>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <p className="text-sm font-medium text-muted-foreground mb-3">Тип блюда</p>
+          <div className="flex flex-wrap gap-2">
+            {foodTypeOptions.map((type) => {
+              const config = foodTypeLabels[type];
+              const isSelected = foodType === type;
+              return (
+                <Badge
+                  key={type}
+                  variant="outline"
+                  onClick={() => setFoodType(isSelected ? undefined : type)}
+                  className={`cursor-pointer px-4 py-2 text-sm transition-all ${
+                    isSelected 
+                      ? config.color + " border"
+                      : "bg-background hover:bg-muted"
+                  }`}
+                  data-testid={`button-type-${type}`}
+                >
+                  {config.label}
+                </Badge>
+              );
+            })}
+          </div>
+        </div>
+
+        <Button
+          size="lg"
+          className="w-full gap-2 shadow-lg"
+          onClick={handleSubmit}
+          disabled={ingredients.length === 0}
+          data-testid="button-generate"
+        >
+          <Sparkles className="h-5 w-5" />
+          Показать рецепты
+        </Button>
+
+        {ingredients.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Добавьте продукты для поиска рецептов
+          </p>
+        )}
       </div>
     </div>
   );

@@ -51,6 +51,10 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
       "shortDescription": "Очень краткое описание в 5-7 слов (для карточки превью)",
       "description": "Полное описание блюда (2-3 предложения)",
       "cookingTime": "X мин",
+      "calories": 350,
+      "protein": 25,
+      "fats": 15,
+      "carbs": 30,
       "ingredients": [
         {"name": "Название продукта", "amount": "количество (например, 200 г или 2 шт)"}
       ],
@@ -66,7 +70,8 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
 - Шаги должны быть понятными и подробными
 - Укажи точное время приготовления в минутах
 - В поле "name" ингредиента указывай только название продукта (без количества)
-- В поле "amount" указывай количество (граммы, штуки, ложки и т.д.)`;
+- В поле "amount" указывай количество (граммы, штуки, ложки и т.д.)
+- Обязательно укажи калорийность (calories) и БЖУ (protein, fats, carbs) на порцию в числовом формате`;
 
   console.log("\n=== ЗАПРОС В CHATGPT ===");
   console.log("Промпт:", prompt);

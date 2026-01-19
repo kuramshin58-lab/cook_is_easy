@@ -133,6 +133,10 @@ export const recipeSchema = z.object({
   ingredients: z.array(ingredientSchema),
   steps: z.array(z.string()),
   tips: z.string().optional(),
+  calories: z.number().optional(),
+  protein: z.number().optional(),
+  fats: z.number().optional(),
+  carbs: z.number().optional(),
 });
 
 export type Recipe = z.infer<typeof recipeSchema>;
