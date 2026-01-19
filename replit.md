@@ -13,6 +13,11 @@
   - Supabase database integration for user storage
   - Personalized recipe generation based on user preferences
   - Header with login/logout functionality
+- 2026-01-19: Enhanced Recipe Display
+  - Recipe preview cards with compact info: title, short description, time, ingredient matching
+  - Full recipe modal with detailed ingredients (with amounts) and availability status
+  - Ingredient synchronization: user's base ingredients + search ingredients combined
+  - Visual indicators: available ingredients (green checkmark) vs missing (grey X)
 
 ## Project Architecture
 
