@@ -49,7 +49,14 @@ export default function Home() {
       } : undefined
     };
 
+    // Объединяем все продукты пользователя: введённые + базовые из профиля
+    const combinedIngredients = user 
+      ? [...ingredients, ...user.base_ingredients]
+      : ingredients;
+    const allUserIngredients = Array.from(new Set(combinedIngredients));
+    
     sessionStorage.setItem("recipeRequest", JSON.stringify(request));
+    sessionStorage.setItem("userIngredients", JSON.stringify(allUserIngredients));
     setLocation("/recipes");
   };
 

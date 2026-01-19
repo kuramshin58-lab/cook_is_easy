@@ -11,7 +11,10 @@ export default function Recipes() {
   const [, setLocation] = useLocation();
 
   const storedData = sessionStorage.getItem("recipeRequest");
+  const storedIngredients = sessionStorage.getItem("userIngredients");
+  
   const recipeRequest: RecipeRequest | null = storedData ? JSON.parse(storedData) : null;
+  const userIngredients: string[] = storedIngredients ? JSON.parse(storedIngredients) : [];
 
   const generateRecipes = useMutation({
     mutationFn: async (data: RecipeRequest) => {
@@ -62,6 +65,7 @@ export default function Recipes() {
 
         <RecipeList
           recipes={recipes}
+          userIngredients={userIngredients}
           isLoading={generateRecipes.isPending}
           error={generateRecipes.error ? "Произошла ошибка при генерации рецептов. Попробуйте еще раз." : null}
           hasSearched={true}
