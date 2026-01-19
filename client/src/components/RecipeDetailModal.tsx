@@ -39,13 +39,13 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
           <div className="p-6">
             <DialogHeader className="mb-4">
               <div className="flex items-start justify-between gap-3 pr-8">
-                <DialogTitle className="text-xl leading-tight">{recipe.title}</DialogTitle>
-                <Badge variant="secondary" className="shrink-0 gap-1">
+                <DialogTitle className="text-xl leading-tight" data-testid="text-modal-title">{recipe.title}</DialogTitle>
+                <Badge variant="secondary" className="shrink-0 gap-1" data-testid="badge-modal-time">
                   <Clock className="h-3 w-3" />
                   {recipe.cookingTime}
                 </Badge>
               </div>
-              <p className="text-muted-foreground text-sm mt-2">{recipe.description}</p>
+              <p className="text-muted-foreground text-sm mt-2" data-testid="text-modal-description">{recipe.description}</p>
             </DialogHeader>
 
             <div className="space-y-6">

@@ -39,31 +39,31 @@ export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: R
     >
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="font-semibold text-lg leading-tight">{recipe.title}</h3>
-          <Badge variant="secondary" className="shrink-0 gap-1">
+          <h3 className="font-semibold text-lg leading-tight" data-testid={`text-recipe-title-${index}`}>{recipe.title}</h3>
+          <Badge variant="secondary" className="shrink-0 gap-1" data-testid={`badge-time-${index}`}>
             <Clock className="h-3 w-3" />
             {recipe.cookingTime}
           </Badge>
         </div>
         
-        <p className="text-muted-foreground text-sm mb-4">{recipe.shortDescription}</p>
+        <p className="text-muted-foreground text-sm mb-4" data-testid={`text-recipe-description-${index}`}>{recipe.shortDescription}</p>
         
         <div className="flex items-center justify-between gap-2 text-sm">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-primary">
+            <div className="flex items-center gap-1.5 text-primary" data-testid={`text-matching-count-${index}`}>
               <Check className="h-4 w-4" />
               <span>{matchingCount} из {totalIngredients}</span>
             </div>
             
             {missingCount > 0 && (
-              <div className="flex items-center gap-1.5 text-muted-foreground">
+              <div className="flex items-center gap-1.5 text-muted-foreground" data-testid={`text-missing-count-${index}`}>
                 <ShoppingCart className="h-4 w-4" />
                 <span>+{missingCount} докупить</span>
               </div>
             )}
           </div>
           
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5" data-testid={`text-match-percentage-${index}`}>
             <ChefHat className="h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">{matchPercentage}%</span>
           </div>
