@@ -11,6 +11,13 @@ export const mealTypeOptions = [
 ] as const;
 export type MealType = typeof mealTypeOptions[number];
 
+export const skillLevelOptions = [
+  "Новичок",
+  "Средний",
+  "Мишлен"
+] as const;
+export type SkillLevel = typeof skillLevelOptions[number];
+
 export const foodTypeOptions = ["ПП", "Обычная", "Жирная"] as const;
 export type FoodType = typeof foodTypeOptions[number];
 
@@ -105,6 +112,7 @@ export const recipeRequestSchema = z.object({
   ingredients: z.array(z.string()).min(1, "Добавьте хотя бы один ингредиент"),
   cookingTime: z.enum(cookingTimeOptions),
   mealType: z.enum(mealTypeOptions).optional(),
+  skillLevel: z.enum(skillLevelOptions).optional(),
   foodType: z.enum(foodTypeOptions).optional(),
   userPreferences: z.object({
     baseIngredients: z.array(z.string()).optional(),

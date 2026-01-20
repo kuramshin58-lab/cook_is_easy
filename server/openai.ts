@@ -4,7 +4,7 @@ import { recipeResponseSchema, type RecipeRequest, type Recipe } from "@shared/s
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]> {
-  const { ingredients, cookingTime, mealType, foodType, userPreferences } = request;
+  const { ingredients, cookingTime, mealType, skillLevel, foodType, userPreferences } = request;
 
   const ingredientsList = ingredients.join(", ");
   
@@ -15,6 +15,16 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
 
   if (mealType) {
     prompt += `\n- Тип блюда: ${mealType}`;
+  }
+
+  if (skillLevel) {
+    if (skillLevel === "Новичок") {
+      prompt += `\n- Уровень сложности: простые рецепты для начинающих, минимум ингредиентов и шагов, базовые техники`;
+    } else if (skillLevel === "Средний") {
+      prompt += `\n- Уровень сложности: средний, можно использовать более сложные техники и больше ингредиентов`;
+    } else if (skillLevel === "Мишлен") {
+      prompt += `\n- Уровень сложности: высокий (ресторанный уровень), изысканные блюда, сложные техники, презентация`;
+    }
   }
 
   if (foodType) {

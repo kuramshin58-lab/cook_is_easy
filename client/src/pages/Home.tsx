@@ -25,9 +25,11 @@ import { useAuth } from "@/lib/auth";
 import { 
   cookingTimeOptions, 
   mealTypeOptions, 
+  skillLevelOptions,
   foodTypeOptions,
   type CookingTime,
   type MealType,
+  type SkillLevel,
   type FoodType,
   type RecipeRequest
 } from "@shared/schema";
@@ -195,6 +197,12 @@ const mealTypeLabels: Record<MealType, { label: string; icon: typeof Flame }> = 
   "Салат": { label: "Салат", icon: Salad },
 };
 
+const skillLevelLabels: Record<SkillLevel, { label: string; color: string }> = {
+  "Новичок": { label: "Новичок", color: "bg-green-100 text-green-700 border-green-200" },
+  "Средний": { label: "Средний", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  "Мишлен": { label: "Мишлен", color: "bg-purple-100 text-purple-700 border-purple-200" },
+};
+
 const foodTypeLabels: Record<FoodType, { label: string; color: string }> = {
   "ПП": { label: "ПП", color: "bg-green-100 text-green-700 border-green-200" },
   "Обычная": { label: "Обычная", color: "bg-blue-100 text-blue-700 border-blue-200" },
@@ -207,6 +215,7 @@ function RecipeGenerator() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [cookingTime, setCookingTime] = useState<CookingTime>("40");
   const [mealType, setMealType] = useState<MealType | undefined>();
+  const [skillLevel, setSkillLevel] = useState<SkillLevel | undefined>();
   const [foodType, setFoodType] = useState<FoodType | undefined>();
 
   const handleAddIngredient = (ingredient: string) => {
@@ -226,6 +235,7 @@ function RecipeGenerator() {
       ingredients,
       cookingTime,
       mealType,
+      skillLevel,
       foodType,
       userPreferences: user ? {
         baseIngredients: user.base_ingredients,
@@ -327,6 +337,31 @@ function RecipeGenerator() {
                     </span>
                   </CardContent>
                 </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted-foreground mb-3">Уровень готовки</p>
+          <div className="flex flex-wrap gap-2">
+            {skillLevelOptions.map((level) => {
+              const config = skillLevelLabels[level];
+              const isSelected = skillLevel === level;
+              return (
+                <Badge
+                  key={level}
+                  variant="outline"
+                  onClick={() => setSkillLevel(isSelected ? undefined : level)}
+                  className={`cursor-pointer px-4 py-2 text-sm transition-all ${
+                    isSelected 
+                      ? config.color + " border"
+                      : "bg-background hover:bg-muted"
+                  }`}
+                  data-testid={`button-skill-${level}`}
+                >
+                  {config.label}
+                </Badge>
               );
             })}
           </div>
