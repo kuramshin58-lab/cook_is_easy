@@ -38,6 +38,12 @@
   - Recipe preview cards: soft shadows, match percentage indicator, gradient progress bar
   - Recipe detail modal: КБЖУ (calories/protein/fats/carbs) in colored cards
   - Updated OpenAI prompt to generate nutritional information
+- 2026-01-20: Enhanced Onboarding Step 2 (Base Ingredients)
+  - Search input with autocomplete from 400+ ingredients
+  - Only 5 recommendations shown at a time
+  - Dynamic replacement: selected recommendation replaced by next from list
+  - Selected ingredients shown separately with X to remove
+  - Click outside to close search dropdown
 
 ## Project Architecture
 
