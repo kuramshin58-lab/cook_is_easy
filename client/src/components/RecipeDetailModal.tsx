@@ -21,12 +21,34 @@ function normalizeIngredient(name: string): string {
   return name.toLowerCase().trim();
 }
 
+function getTokens(str: string): Set<string> {
+  return new Set(
+    str.toLowerCase()
+      .replace(/[^\wа-яё\s]/gi, '')
+      .split(/\s+/)
+      .filter(t => t.length > 1)
+  );
+}
+
+function tokensMatch(str1: string, str2: string): boolean {
+  const tokens1 = getTokens(str1);
+  const tokens2 = getTokens(str2);
+  
+  const [smaller, larger] = tokens1.size <= tokens2.size ? [tokens1, tokens2] : [tokens2, tokens1];
+  
+  const matchCount = Array.from(smaller).filter(token => larger.has(token)).length;
+  
+  return matchCount >= Math.min(smaller.size, 1) && matchCount >= smaller.size * 0.5;
+}
+
 function isIngredientAvailable(ingredientName: string, userIngredients: string[]): boolean {
   const normalizedIngredient = normalizeIngredient(ingredientName);
   const normalizedUserIngredients = userIngredients.map(normalizeIngredient);
   
   return normalizedUserIngredients.some(userIng => 
-    normalizedIngredient.includes(userIng) || userIng.includes(normalizedIngredient)
+    normalizedIngredient.includes(userIng) || 
+    userIng.includes(normalizedIngredient) ||
+    tokensMatch(ingredientName, userIng)
   );
 }
 

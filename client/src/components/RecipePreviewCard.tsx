@@ -14,13 +14,35 @@ function normalizeIngredient(name: string): string {
   return name.toLowerCase().trim();
 }
 
+function getTokens(str: string): Set<string> {
+  return new Set(
+    str.toLowerCase()
+      .replace(/[^\wа-яё\s]/gi, '')
+      .split(/\s+/)
+      .filter(t => t.length > 1)
+  );
+}
+
+function tokensMatch(str1: string, str2: string): boolean {
+  const tokens1 = getTokens(str1);
+  const tokens2 = getTokens(str2);
+  
+  const [smaller, larger] = tokens1.size <= tokens2.size ? [tokens1, tokens2] : [tokens2, tokens1];
+  
+  const matchCount = Array.from(smaller).filter(token => larger.has(token)).length;
+  
+  return matchCount >= Math.min(smaller.size, 1) && matchCount >= smaller.size * 0.5;
+}
+
 function countMatchingIngredients(recipe: Recipe, userIngredients: string[]): number {
   const normalizedUserIngredients = userIngredients.map(normalizeIngredient);
   
   return recipe.ingredients.filter(ingredient => {
     const ingredientName = normalizeIngredient(ingredient.name);
     return normalizedUserIngredients.some(userIng => 
-      ingredientName.includes(userIng) || userIng.includes(ingredientName)
+      ingredientName.includes(userIng) || 
+      userIng.includes(ingredientName) ||
+      tokensMatch(ingredient.name, userIng)
     );
   }).length;
 }
