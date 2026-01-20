@@ -44,6 +44,11 @@
   - Dynamic replacement: selected recommendation replaced by next from list
   - Selected ingredients shown separately with X to remove
   - Click outside to close search dropdown
+- 2026-01-20: Replaced cooking method with meal type selection
+  - Removed "Способ приготовления" (cooking method: варка, жарка, etc.)
+  - Added "Тип блюда" (meal type): Завтрак, Основное блюдо, Перекус, Салат
+  - Updated OpenAI prompt to use meal type for better recipe suggestions
+  - Token-based ingredient matching for word order variations
 
 ## Project Architecture
 

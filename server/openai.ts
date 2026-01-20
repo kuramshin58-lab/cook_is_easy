@@ -4,7 +4,7 @@ import { recipeResponseSchema, type RecipeRequest, type Recipe } from "@shared/s
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]> {
-  const { ingredients, cookingTime, cookingMethod, foodType, userPreferences } = request;
+  const { ingredients, cookingTime, mealType, foodType, userPreferences } = request;
 
   const ingredientsList = ingredients.join(", ");
   
@@ -13,8 +13,8 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
 Требования:
 - Время приготовления каждого блюда должно быть не более ${cookingTime} минут`;
 
-  if (cookingMethod) {
-    prompt += `\n- Способ приготовления: ${cookingMethod}`;
+  if (mealType) {
+    prompt += `\n- Тип блюда: ${mealType}`;
   }
 
   if (foodType) {

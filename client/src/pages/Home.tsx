@@ -24,10 +24,10 @@ import {
 import { useAuth } from "@/lib/auth";
 import { 
   cookingTimeOptions, 
-  cookingMethodOptions, 
+  mealTypeOptions, 
   foodTypeOptions,
   type CookingTime,
-  type CookingMethod,
+  type MealType,
   type FoodType,
   type RecipeRequest
 } from "@shared/schema";
@@ -188,14 +188,11 @@ const cookingTimeLabels: Record<CookingTime, { label: string; icon: typeof Timer
   "60": { label: "1 час", icon: Clock },
 };
 
-const cookingMethodLabels: Record<CookingMethod, { label: string; icon: typeof Flame }> = {
-  "Варка": { label: "Варка", icon: Soup },
-  "Жарка": { label: "Жарка", icon: Flame },
-  "Запекание": { label: "Запекание", icon: CookingPot },
-  "Тушение": { label: "Тушение", icon: CookingPot },
-  "На пару": { label: "На пару", icon: Soup },
-  "Гриль": { label: "Гриль", icon: Flame },
-  "Без готовки": { label: "Без готовки", icon: Salad },
+const mealTypeLabels: Record<MealType, { label: string; icon: typeof Flame }> = {
+  "Завтрак": { label: "Завтрак", icon: Soup },
+  "Основное блюдо": { label: "Основное блюдо", icon: CookingPot },
+  "Перекус": { label: "Перекус", icon: Utensils },
+  "Салат": { label: "Салат", icon: Salad },
 };
 
 const foodTypeLabels: Record<FoodType, { label: string; color: string }> = {
@@ -209,7 +206,7 @@ function RecipeGenerator() {
   const { user } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [cookingTime, setCookingTime] = useState<CookingTime>("40");
-  const [cookingMethod, setCookingMethod] = useState<CookingMethod | undefined>();
+  const [mealType, setMealType] = useState<MealType | undefined>();
   const [foodType, setFoodType] = useState<FoodType | undefined>();
 
   const handleAddIngredient = (ingredient: string) => {
@@ -228,7 +225,7 @@ function RecipeGenerator() {
     const request: RecipeRequest = {
       ingredients,
       cookingTime,
-      cookingMethod,
+      mealType,
       foodType,
       userPreferences: user ? {
         baseIngredients: user.base_ingredients,
@@ -307,25 +304,25 @@ function RecipeGenerator() {
         </div>
 
         <div className="mb-6">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Способ приготовления</p>
-          <div className="grid grid-cols-3 gap-3">
-            {cookingMethodOptions.map((method) => {
-              const config = cookingMethodLabels[method];
-              const isSelected = cookingMethod === method;
+          <p className="text-sm font-medium text-muted-foreground mb-3">Тип блюда</p>
+          <div className="grid grid-cols-2 gap-3">
+            {mealTypeOptions.map((type) => {
+              const config = mealTypeLabels[type];
+              const isSelected = mealType === type;
               return (
                 <Card 
-                  key={method}
-                  onClick={() => setCookingMethod(isSelected ? undefined : method)}
+                  key={type}
+                  onClick={() => setMealType(isSelected ? undefined : type)}
                   className={`cursor-pointer transition-all border-2 shadow-sm hover-elevate ${
                     isSelected 
                       ? "border-primary bg-primary/5" 
                       : "border-transparent hover:border-muted"
                   }`}
-                  data-testid={`button-method-${method}`}
+                  data-testid={`button-meal-${type}`}
                 >
-                  <CardContent className="p-3 text-center">
-                    <config.icon className={`h-5 w-5 mx-auto mb-1 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                    <span className={`text-xs font-medium ${isSelected ? "text-primary" : ""}`}>
+                  <CardContent className="p-4 text-center">
+                    <config.icon className={`h-6 w-6 mx-auto mb-2 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className={`text-sm font-medium ${isSelected ? "text-primary" : ""}`}>
                       {config.label}
                     </span>
                   </CardContent>
@@ -336,7 +333,7 @@ function RecipeGenerator() {
         </div>
 
         <div className="mb-8">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Тип блюда</p>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Стиль питания</p>
           <div className="flex flex-wrap gap-2">
             {foodTypeOptions.map((type) => {
               const config = foodTypeLabels[type];

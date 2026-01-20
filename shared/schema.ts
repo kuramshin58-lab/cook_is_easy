@@ -3,16 +3,13 @@ import { z } from "zod";
 export const cookingTimeOptions = ["20", "40", "60"] as const;
 export type CookingTime = typeof cookingTimeOptions[number];
 
-export const cookingMethodOptions = [
-  "Варка",
-  "Жарка",
-  "Запекание",
-  "Тушение",
-  "На пару",
-  "Гриль",
-  "Без готовки"
+export const mealTypeOptions = [
+  "Завтрак",
+  "Основное блюдо",
+  "Перекус",
+  "Салат"
 ] as const;
-export type CookingMethod = typeof cookingMethodOptions[number];
+export type MealType = typeof mealTypeOptions[number];
 
 export const foodTypeOptions = ["ПП", "Обычная", "Жирная"] as const;
 export type FoodType = typeof foodTypeOptions[number];
@@ -107,7 +104,7 @@ export type LoginUser = z.infer<typeof loginUserSchema>;
 export const recipeRequestSchema = z.object({
   ingredients: z.array(z.string()).min(1, "Добавьте хотя бы один ингредиент"),
   cookingTime: z.enum(cookingTimeOptions),
-  cookingMethod: z.enum(cookingMethodOptions).optional(),
+  mealType: z.enum(mealTypeOptions).optional(),
   foodType: z.enum(foodTypeOptions).optional(),
   userPreferences: z.object({
     baseIngredients: z.array(z.string()).optional(),
