@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ChefHat, ArrowRight, ArrowLeft, Sparkles, Check, Utensils, ShoppingBag, Heart } from "lucide-react";
+import { ChefHat, ArrowRight, ArrowLeft, Sparkles, Check, Utensils, ShoppingBag, Heart, Search, X, Plus } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +15,8 @@ import {
   baseIngredientsOptions,
   equipmentOptions,
   cuisinePreferencesOptions,
-  dietPreferencesOptions
+  dietPreferencesOptions,
+  popularIngredients
 } from "@shared/schema";
 
 type OnboardingStep = 1 | 2 | 3 | 4 | 5;
@@ -32,6 +33,69 @@ export default function Onboarding() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
+  // Step 2: ingredient search and recommendations
+  const [ingredientSearch, setIngredientSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [recommendationIndex, setRecommendationIndex] = useState(0);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Close suggestions on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Get 5 visible recommendations (not already selected)
+  const visibleRecommendations = useMemo(() => {
+    const notSelected = baseIngredientsOptions.filter(
+      (item) => !baseIngredients.includes(item)
+    );
+    return notSelected.slice(recommendationIndex, recommendationIndex + 5);
+  }, [baseIngredients, recommendationIndex]);
+
+  // Filter all ingredients for search
+  const filteredIngredients = useMemo(() => {
+    if (!ingredientSearch.trim()) return [];
+    const query = ingredientSearch.toLowerCase();
+    return popularIngredients
+      .filter(
+        (item) => 
+          item.toLowerCase().includes(query) && 
+          !baseIngredients.includes(item)
+      )
+      .slice(0, 8);
+  }, [ingredientSearch, baseIngredients]);
+
+  const addIngredient = (item: string) => {
+    if (!baseIngredients.includes(item)) {
+      setBaseIngredients([...baseIngredients, item]);
+    }
+    setIngredientSearch("");
+    setShowSuggestions(false);
+  };
+
+  const removeIngredient = (item: string) => {
+    setBaseIngredients(baseIngredients.filter((i) => i !== item));
+  };
+
+  const selectRecommendation = (item: string) => {
+    addIngredient(item);
+    // Move to next recommendation
+    const remaining = baseIngredientsOptions.filter(
+      (i) => !baseIngredients.includes(i) && i !== item
+    );
+    if (remaining.length > 5) {
+      setRecommendationIndex((prev) => 
+        prev + 1 < remaining.length - 4 ? prev + 1 : 0
+      );
+    }
+  };
 
   const registerMutation = useMutation({
     mutationFn: async (data: {
@@ -160,26 +224,81 @@ export default function Onboarding() {
                   Что обычно есть у вас дома?
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {baseIngredientsOptions.map((item) => {
-                  const isSelected = baseIngredients.includes(item);
-                  return (
+
+              {/* Search input */}
+              <div className="relative" ref={searchRef}>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Поиск ингредиентов..."
+                    value={ingredientSearch}
+                    onChange={(e) => {
+                      setIngredientSearch(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    className="pl-10 h-12"
+                    data-testid="input-ingredient-search"
+                  />
+                </div>
+                
+                {/* Search suggestions dropdown */}
+                {showSuggestions && filteredIngredients.length > 0 && (
+                  <Card className="absolute z-10 w-full mt-1 max-h-64 overflow-y-auto shadow-lg border">
+                    {filteredIngredients.map((item) => (
+                      <div
+                        key={item}
+                        onClick={() => addIngredient(item)}
+                        className="px-4 py-3 cursor-pointer hover:bg-muted flex items-center gap-2 border-b last:border-b-0"
+                        data-testid={`suggestion-${item}`}
+                      >
+                        <Plus className="h-4 w-4 text-primary" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </Card>
+                )}
+              </div>
+
+              {/* Selected ingredients */}
+              {baseIngredients.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Выбрано: {baseIngredients.length}</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {baseIngredients.map((item) => (
+                      <Badge
+                        key={item}
+                        className="bg-primary text-primary-foreground py-2 px-3 text-sm gap-1"
+                        data-testid={`selected-ingredient-${item}`}
+                      >
+                        {item}
+                        <X 
+                          className="h-3 w-3 cursor-pointer hover:opacity-70" 
+                          onClick={() => removeIngredient(item)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations - only 5 visible */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Рекомендуем добавить</Label>
+                <div className="flex flex-wrap gap-2">
+                  {visibleRecommendations.map((item) => (
                     <Badge
                       key={item}
                       variant="outline"
-                      onClick={() => toggleItem(item, baseIngredients, setBaseIngredients)}
-                      className={`cursor-pointer py-2 px-4 text-sm transition-all ${
-                        isSelected 
-                          ? "bg-primary text-primary-foreground border-primary" 
-                          : "hover:bg-muted"
-                      }`}
+                      onClick={() => selectRecommendation(item)}
+                      className="cursor-pointer py-2 px-4 text-sm transition-all hover:bg-muted"
                       data-testid={`badge-ingredient-${item}`}
                     >
-                      {isSelected && <Check className="h-3 w-3 mr-1" />}
+                      <Plus className="h-3 w-3 mr-1" />
                       {item}
                     </Badge>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             </div>
           )}
