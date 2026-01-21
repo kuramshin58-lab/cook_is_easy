@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RecipePreviewCard } from "./RecipePreviewCard";
 import { RecipeDetailModal } from "./RecipeDetailModal";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { UtensilsCrossed, AlertCircle } from "lucide-react";
+import { UtensilsCrossed, AlertCircle, ChefHat } from "lucide-react";
 import type { Recipe } from "@shared/schema";
+
+const loadingPhrases = [
+  "Разогреваем сковородку…",
+  "Точим ножи…",
+  "Достаём любимую тарелку…",
+  "Смешиваем идеи в миске…",
+  "Проверяем, что есть специи…",
+  "Ставим воду закипать…",
+  "Отмеряем «щепотку магии»…",
+  "Пробуем соус на вкус…",
+  "Хрустим луком (мысленно)…",
+  "Финально собираем рецепт…",
+];
 
 interface RecipeListProps {
   recipes: Recipe[];
@@ -14,21 +26,55 @@ interface RecipeListProps {
   hasSearched: boolean;
 }
 
-function RecipeSkeleton() {
+function CookingLoadingAnimation() {
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [fadeIn, setFadeIn] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFadeIn(false);
+      setTimeout(() => {
+        setPhraseIndex((prev) => (prev + 1) % loadingPhrases.length);
+        setFadeIn(true);
+      }, 300);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-6 w-16" />
+    <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="loading-recipes">
+      <div className="relative mb-8">
+        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+          <ChefHat className="h-12 w-12 text-primary" />
         </div>
-        <Skeleton className="h-4 w-full mb-4" />
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-12" />
+        <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      <h3 className="text-lg font-semibold mb-2">Готовим ваши рецепты</h3>
+      
+      <div className="h-8 flex items-center justify-center">
+        <p 
+          className={`text-muted-foreground transition-opacity duration-300 ${
+            fadeIn ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {loadingPhrases[phraseIndex]}
+        </p>
+      </div>
+      
+      <div className="flex gap-1.5 mt-6">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
+            style={{ animationDelay: `${i * 0.15}s` }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -36,17 +82,7 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   if (isLoading) {
-    return (
-      <div className="space-y-4" data-testid="loading-recipes">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
-          <span className="text-sm">Генерируем рецепты для вас...</span>
-        </div>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <RecipeSkeleton key={i} />
-        ))}
-      </div>
-    );
+    return <CookingLoadingAnimation />;
   }
 
   if (error) {
