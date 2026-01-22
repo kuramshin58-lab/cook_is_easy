@@ -112,12 +112,30 @@ function normalizeIngredient(ingredient: string): string[] {
   return [...baseTokens, ...translations];
 }
 
+// Ингредиенты которые "специальные" - дают бустер если совпадают
+const specialIngredients = [
+  'тыква', 'pumpkin', 'squash', 'butternut',
+  'сливки', 'cream',
+  'грибы', 'mushroom', 
+  'шпинат', 'spinach',
+  'баклажан', 'eggplant',
+  'кабачок', 'zucchini'
+];
+
 function calculateMatchScore(recipeIngredients: string[], userIngredients: string[]): number {
   const userTokens = new Set(
     userIngredients.flatMap(ing => normalizeIngredient(ing))
   );
   
+  // Проверяем какие специальные ингредиенты ввёл пользователь
+  const userSpecialTokens = new Set(
+    Array.from(userTokens).filter(token => 
+      specialIngredients.some(special => token.includes(special) || special.includes(token))
+    )
+  );
+  
   let matchedCount = 0;
+  let specialMatches = 0;
   
   for (const recipeIng of recipeIngredients) {
     const recipeTokens = normalizeIngredient(recipeIng);
@@ -132,12 +150,27 @@ function calculateMatchScore(recipeIngredients: string[], userIngredients: strin
     
     if (hasMatch) {
       matchedCount++;
+      
+      // Проверяем совпадение специальных ингредиентов
+      const isSpecialMatch = recipeTokens.some(token =>
+        Array.from(userSpecialTokens).some(special => 
+          token.includes(special) || special.includes(token)
+        )
+      );
+      if (isSpecialMatch) {
+        specialMatches++;
+      }
     }
   }
   
-  return recipeIngredients.length > 0 
+  const baseScore = recipeIngredients.length > 0 
     ? matchedCount / recipeIngredients.length 
     : 0;
+  
+  // Бустер за специальные ингредиенты (до +30%)
+  const specialBoost = specialMatches > 0 ? 0.3 : 0;
+  
+  return Math.min(1, baseScore + specialBoost);
 }
 
 function mapDifficultyToSkillLevel(difficulty: string): string {
