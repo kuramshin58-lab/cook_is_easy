@@ -16,12 +16,100 @@ interface DbRecipe {
   source_url: string;
 }
 
+// Словарь перевода русских ингредиентов на английские ключевые слова
+const ingredientTranslations: Record<string, string[]> = {
+  // Паста и макароны
+  'макароны': ['pasta', 'penne', 'spaghetti', 'macaroni', 'noodle', 'fettuccine', 'linguine', 'rigatoni'],
+  'паста': ['pasta', 'penne', 'spaghetti', 'noodle', 'fettuccine', 'linguine'],
+  'спагетти': ['spaghetti', 'pasta'],
+  'пенне': ['penne', 'pasta'],
+  'лапша': ['noodle', 'pasta'],
+  
+  // Мясо
+  'курица': ['chicken', 'poultry'],
+  'куриная грудка': ['chicken breast', 'chicken'],
+  'куриное филе': ['chicken breast', 'chicken'],
+  'говядина': ['beef', 'steak'],
+  'свинина': ['pork', 'bacon'],
+  'бекон': ['bacon', 'pork'],
+  'фарш': ['ground', 'mince', 'beef', 'meat'],
+  
+  // Овощи
+  'картошка': ['potato', 'potatoes'],
+  'картофель': ['potato', 'potatoes'],
+  'помидоры': ['tomato', 'tomatoes', 'cherry tomatoes'],
+  'томаты': ['tomato', 'tomatoes'],
+  'лук': ['onion', 'onions'],
+  'чеснок': ['garlic'],
+  'морковь': ['carrot', 'carrots'],
+  'перец': ['pepper', 'bell pepper'],
+  'болгарский перец': ['bell pepper', 'pepper'],
+  'брокколи': ['broccoli'],
+  'шпинат': ['spinach'],
+  'тыква': ['pumpkin', 'squash', 'butternut'],
+  'баклажан': ['eggplant', 'aubergine'],
+  'кабачок': ['zucchini', 'courgette'],
+  'огурец': ['cucumber'],
+  'капуста': ['cabbage'],
+  'грибы': ['mushroom', 'mushrooms', 'porcini'],
+  
+  // Молочные продукты
+  'сливки': ['cream', 'heavy cream'],
+  'молоко': ['milk'],
+  'сыр': ['cheese'],
+  'пармезан': ['parmesan', 'cheese'],
+  'моцарелла': ['mozzarella', 'cheese'],
+  'фета': ['feta', 'cheese'],
+  'сметана': ['sour cream'],
+  'йогурт': ['yogurt'],
+  'масло сливочное': ['butter'],
+  
+  // Другое
+  'яйца': ['egg', 'eggs'],
+  'яйцо': ['egg', 'eggs'],
+  'рис': ['rice', 'basmati'],
+  'мука': ['flour'],
+  'хлеб': ['bread'],
+  'оливковое масло': ['olive oil'],
+  'лимон': ['lemon'],
+  'чили': ['chili', 'chilli'],
+  'базилик': ['basil'],
+  'орегано': ['oregano'],
+  'петрушка': ['parsley'],
+  'кинза': ['cilantro', 'coriander'],
+  'имбирь': ['ginger'],
+  'соевый соус': ['soy sauce'],
+};
+
+function translateIngredient(ingredient: string): string[] {
+  const lower = ingredient.toLowerCase().trim();
+  
+  // Проверяем полное совпадение
+  if (ingredientTranslations[lower]) {
+    return ingredientTranslations[lower];
+  }
+  
+  // Проверяем частичное совпадение
+  for (const [russian, english] of Object.entries(ingredientTranslations)) {
+    if (lower.includes(russian) || russian.includes(lower)) {
+      return english;
+    }
+  }
+  
+  return [];
+}
+
 function normalizeIngredient(ingredient: string): string[] {
-  return ingredient
+  const baseTokens = ingredient
     .toLowerCase()
     .replace(/[.,!?]/g, '')
     .split(/\s+/)
     .filter(word => word.length > 2);
+  
+  // Добавляем переводы на английский
+  const translations = translateIngredient(ingredient);
+  
+  return [...baseTokens, ...translations];
 }
 
 function calculateMatchScore(recipeIngredients: string[], userIngredients: string[]): number {
