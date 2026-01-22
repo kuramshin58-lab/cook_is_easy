@@ -96,8 +96,14 @@ function parseCSVLine(line: string): string[] {
 }
 
 async function main() {
-  console.log('Reading CSV file...');
-  const csvPath = path.join(process.cwd(), 'attached_assets', 'pasta_recipes_1769109350623.csv');
+  const csvFileName = process.argv[2];
+  if (!csvFileName) {
+    console.error('Usage: npx tsx scripts/setup-recipes-table.ts <csv_filename>');
+    process.exit(1);
+  }
+  
+  console.log(`Reading CSV file: ${csvFileName}...`);
+  const csvPath = path.join(process.cwd(), 'attached_assets', csvFileName);
   const csvContent = fs.readFileSync(csvPath, 'utf-8');
   
   const rawRecipes = parseCSV(csvContent);
