@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema } from "@shared/schema";
 import { generateRecipes } from "./openai";
+import { searchRecipesInDatabase } from "./recipeSearch";
 import { supabase } from "./supabase";
 import bcrypt from "bcryptjs";
 
@@ -153,9 +154,34 @@ export async function registerRoutes(
         });
       }
 
-      const recipes = await generateRecipes(validationResult.data);
+      const request = validationResult.data;
       
-      return res.json({ recipes });
+      console.log("\n=== ГИБРИДНЫЙ ПОИСК РЕЦЕПТОВ ===");
+      console.log("1. Ищем в базе данных...");
+      
+      const { recipes: dbRecipes, foundEnough } = await searchRecipesInDatabase(request, 5);
+      
+      console.log(`   Найдено в базе: ${dbRecipes.length} рецептов`);
+      
+      if (foundEnough) {
+        console.log("   Достаточно результатов из базы, ChatGPT не нужен");
+        console.log("================================\n");
+        return res.json({ recipes: dbRecipes, source: "database" });
+      }
+      
+      console.log("2. Недостаточно рецептов в базе, запрашиваем ChatGPT...");
+      
+      const aiRecipes = await generateRecipes(request);
+      
+      const allRecipes = [...dbRecipes, ...aiRecipes].slice(0, 5);
+      
+      console.log(`   Итого: ${dbRecipes.length} из базы + ${aiRecipes.length} от AI`);
+      console.log("================================\n");
+      
+      return res.json({ 
+        recipes: allRecipes, 
+        source: dbRecipes.length > 0 ? "hybrid" : "ai" 
+      });
     } catch (error) {
       console.error("Error generating recipes:", error);
       return res.status(500).json({ 

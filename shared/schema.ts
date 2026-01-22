@@ -125,7 +125,8 @@ export type RecipeRequest = z.infer<typeof recipeRequestSchema>;
 
 export const ingredientSchema = z.object({
   name: z.string(),
-  amount: z.string()
+  amount: z.string(),
+  available: z.boolean().optional()
 });
 
 export type Ingredient = z.infer<typeof ingredientSchema>;
@@ -142,6 +143,8 @@ export const recipeSchema = z.object({
   protein: z.number().optional(),
   fats: z.number().optional(),
   carbs: z.number().optional(),
+  matchPercentage: z.number().optional(),
+  isFromDatabase: z.boolean().optional()
 });
 
 export type Recipe = z.infer<typeof recipeSchema>;
