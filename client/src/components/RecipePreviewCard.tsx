@@ -49,9 +49,17 @@ function countMatchingIngredients(recipe: Recipe, userIngredients: string[]): nu
 
 export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: RecipePreviewCardProps) {
   const totalIngredients = recipe.ingredients.length;
-  const matchingCount = countMatchingIngredients(recipe, userIngredients);
+  
+  // Используем matchPercentage от бэкенда если есть (для рецептов из базы)
+  // Иначе вычисляем на основе совпадения ингредиентов
+  const backendMatchPercentage = recipe.matchPercentage;
+  const matchingCount = backendMatchPercentage !== undefined 
+    ? Math.round(totalIngredients * backendMatchPercentage / 100)
+    : countMatchingIngredients(recipe, userIngredients);
   const missingCount = totalIngredients - matchingCount;
-  const matchPercentage = Math.round((matchingCount / totalIngredients) * 100);
+  const matchPercentage = backendMatchPercentage !== undefined 
+    ? backendMatchPercentage 
+    : Math.round((matchingCount / totalIngredients) * 100);
 
   return (
     <Card 
