@@ -161,20 +161,14 @@ export const updateProfileSchema = z.object({
 
 export type UpdateProfile = z.infer<typeof updateProfileSchema>;
 
-// Разнообразные продукты для быстрого доступа на главной странице
+// Продукты для быстрого доступа на главной странице (не базовые)
 export const quickAccessIngredients = [
-  "Курица",
-  "Яйца",
-  "Картофель",
-  "Лук",
-  "Помидоры",
-  "Сыр",
+  "Куриная грудка",
+  "Фарш",
+  "Спагетти",
   "Рис",
-  "Макароны",
-  "Говядина",
-  "Лосось",
-  "Морковь",
-  "Чеснок",
+  "Гречка",
+  "Томатная паста",
 ];
 
 export const popularIngredients = [
