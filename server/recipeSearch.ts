@@ -241,14 +241,25 @@ export async function searchRecipesInDatabase(
     ...(request.userPreferences?.baseIngredients || [])
   ];
   
+  console.log('=== ОТЛАДКА ПОИСКА ===');
+  console.log('Введённые ингредиенты:', allIngredients);
+  console.log('Токены пользователя:', allIngredients.flatMap(ing => normalizeIngredient(ing)));
+  console.log('Макс время:', maxTime, 'Сложность:', allowedDifficulties);
+  
   const scoredRecipes = recipes
-    .map((recipe: DbRecipe) => ({
-      recipe,
-      score: calculateMatchScore(recipe.ingredients, allIngredients),
-      totalTime: recipe.prep_time + recipe.cook_time,
-      matchesDifficulty: allowedDifficulties.length === 0 || 
-        allowedDifficulties.some(d => recipe.difficulty.toLowerCase().includes(d.toLowerCase()))
-    }))
+    .map((recipe: DbRecipe) => {
+      const score = calculateMatchScore(recipe.ingredients, allIngredients);
+      const totalTime = recipe.prep_time + recipe.cook_time;
+      const matchesDifficulty = allowedDifficulties.length === 0 || 
+        allowedDifficulties.some(d => recipe.difficulty.toLowerCase().includes(d.toLowerCase()));
+      
+      // Логируем рецепты с тыквой/pumpkin
+      if (recipe.ingredients.some(i => i.toLowerCase().includes('pumpkin') || i.toLowerCase().includes('squash'))) {
+        console.log(`ТЫКВА: "${recipe.title}" score=${score.toFixed(2)} time=${totalTime} diff=${recipe.difficulty} matchDiff=${matchesDifficulty}`);
+      }
+      
+      return { recipe, score, totalTime, matchesDifficulty };
+    })
     .filter(item => item.score > 0.2 && item.totalTime <= maxTime && item.matchesDifficulty)
     .sort((a, b) => b.score - a.score);
   
