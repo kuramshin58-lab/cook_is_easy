@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Recipes from "@/pages/Recipes";
+import ReadyRecipes from "@/pages/ReadyRecipes";
 import Login from "@/pages/Login";
 import Onboarding from "@/pages/Onboarding";
 import Profile from "@/pages/Profile";
@@ -22,6 +23,7 @@ function AppContent() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/recipes" component={Recipes} />
+          <Route path="/ready-recipes" component={ReadyRecipes} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Onboarding} />
           <Route path="/profile" component={Profile} />
