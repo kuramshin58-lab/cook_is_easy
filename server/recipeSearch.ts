@@ -152,9 +152,12 @@ function mapDifficultyToSkillLevel(difficulty: string): string {
 function mapSkillLevelToDifficulties(skillLevel: string | undefined): string[] {
   if (!skillLevel) return [];
   switch (skillLevel) {
+    // Новичок - только лёгкие
     case 'Новичок': return ['Easy', 'easy', 'Легко', 'Простой'];
-    case 'Средний': return ['Medium', 'medium', 'Средний', 'Средне'];
-    case 'Мишлен': return ['Hard', 'hard', 'Сложный', 'Сложно', 'Medium'];
+    // Средний - лёгкие и средние
+    case 'Средний': return ['Easy', 'easy', 'Легко', 'Простой', 'Medium', 'medium', 'Средний', 'Средне'];
+    // Мишлен - все уровни
+    case 'Мишлен': return ['Easy', 'easy', 'Легко', 'Hard', 'hard', 'Сложный', 'Сложно', 'Medium', 'medium', 'Средний'];
     default: return [];
   }
 }
