@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { X, Search } from "lucide-react";
-import { popularIngredients } from "@shared/schema";
+import { popularIngredients, quickAccessIngredients } from "@shared/schema";
 
 interface IngredientInputProps {
   selectedIngredients: string[];
@@ -118,7 +118,7 @@ export function IngredientInput({ selectedIngredients, onAdd, onRemove }: Ingred
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {popularIngredients
+        {quickAccessIngredients
           .filter(i => !selectedIngredients.includes(i))
           .slice(0, 6)
           .map(ingredient => (
