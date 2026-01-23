@@ -4,14 +4,14 @@
 Web application for suggesting recipes based on ingredients you have at home. Users enter ingredients, select filters (time, meal type, skill level, food style) and get 5 unique recipes. Uses hybrid search: database-first with ChatGPT fallback. Registered users get personalized recipes based on their preferences stored in Supabase.
 
 ## Recent Changes
-- 2026-01-23: Fixed search algorithm to prioritize main ingredients over base pantry ingredients
-  - Recipes must now match at least one main search ingredient (not just base ingredients)
-  - Main ingredients get higher weight in scoring
-  - Base ingredients (salt, pepper, oil) still contribute but cannot create matches alone
+- 2026-01-23: Simplified recipe scoring algorithm
+  - Score = pure match percentage (matched ingredients / total recipe ingredients)
+  - Recipes sorted by highest match % first
+  - Minimum 20% match threshold to show recipe
+  - Recipes must match at least one main search ingredient (not just base pantry ingredients)
 - 2026-01-23: Fixed ingredient matching consistency bug
   - Created shared utility: client/src/lib/ingredientMatching.ts
   - Both RecipePreviewCard and RecipeDetailModal now use the same matching algorithm
-  - Backend matchPercentage still used for database recipes (with special ingredient booster)
   - Local calculation used for AI-generated recipes (ChatGPT fallback)
 - 2026-01-23: Full English translation
   - Translated all UI components: Home, IngredientInput, Recipes, Login, Header, Onboarding, Profile, RecipeList, RecipePreviewCard, RecipeDetailModal
@@ -106,9 +106,11 @@ CREATE TABLE recipes (
 
 ### Search Algorithm
 1. Database search first with ingredient matching
-2. Special ingredients (pumpkin, cream, mushrooms, spinach, eggplant, zucchini) get +30% score boost
-3. Filters by cooking time and skill level
-4. If < 5 recipes found, falls back to ChatGPT generation
+2. Score = matched ingredients / total recipe ingredients (pure match %)
+3. Recipes must match at least one main search ingredient
+4. Minimum 20% match threshold
+5. Filters by cooking time and skill level
+6. If < 5 recipes found, falls back to ChatGPT generation
 
 ## User Preferences
 - Communication with user: Russian
