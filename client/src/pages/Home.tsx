@@ -248,10 +248,6 @@ function RecipeGenerator() {
     const combinedIngredients = [...ingredients, ...baseIngredients];
     const allUserIngredients = Array.from(new Set(combinedIngredients));
     
-    console.log("Search ingredients:", ingredients);
-    console.log("Base ingredients from profile:", baseIngredients);
-    console.log("Combined ingredients for matching:", allUserIngredients);
-    
     sessionStorage.setItem("recipeRequest", JSON.stringify(request));
     sessionStorage.setItem("userIngredients", JSON.stringify(allUserIngredients));
     setLocation("/recipes");
