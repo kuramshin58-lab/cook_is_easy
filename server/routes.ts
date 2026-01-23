@@ -1,10 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema } from "@shared/schema";
-import { generateRecipes } from "./openai";
+import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema, recipeSchema } from "@shared/schema";
+import { generateRecipes, adaptRecipe } from "./openai";
 import { searchRecipesInDatabase } from "./recipeSearch";
 import { supabase } from "./supabase";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
+
+const adaptRecipeRequestSchema = z.object({
+  recipe: recipeSchema,
+  userIngredients: z.array(z.string())
+});
 
 export async function registerRoutes(
   httpServer: Server,
@@ -186,6 +192,37 @@ export async function registerRoutes(
       console.error("Error generating recipes:", error);
       return res.status(500).json({ 
         error: "Failed to generate recipes" 
+      });
+    }
+  });
+
+  app.post("/api/recipes/adapt", async (req, res) => {
+    try {
+      const validationResult = adaptRecipeRequestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid request", 
+          details: validationResult.error.errors 
+        });
+      }
+
+      const { recipe, userIngredients } = validationResult.data;
+      
+      console.log("\n=== RECIPE ADAPTATION ===");
+      console.log("Original recipe:", recipe.title);
+      console.log("User ingredients:", userIngredients.length);
+      
+      const adaptedRecipe = await adaptRecipe(recipe, userIngredients);
+      
+      console.log("Substitutions made:", adaptedRecipe.substitutions.length);
+      console.log("==========================\n");
+      
+      return res.json({ recipe: adaptedRecipe });
+    } catch (error) {
+      console.error("Error adapting recipe:", error);
+      return res.status(500).json({ 
+        error: "Failed to adapt recipe" 
       });
     }
   });

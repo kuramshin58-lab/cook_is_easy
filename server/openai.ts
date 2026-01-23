@@ -1,7 +1,111 @@
 import OpenAI from "openai";
-import { recipeResponseSchema, type RecipeRequest, type Recipe } from "@shared/schema";
+import { z } from "zod";
+import { recipeResponseSchema, recipeSchema, ingredientSchema, type RecipeRequest, type Recipe } from "@shared/schema";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+const substitutionSchema = z.object({
+  original: z.string(),
+  replacement: z.string()
+});
+
+const adaptedRecipeResponseSchema = z.object({
+  title: z.string(),
+  shortDescription: z.string(),
+  description: z.string(),
+  cookingTime: z.string(),
+  calories: z.number().optional().default(0),
+  protein: z.number().optional().default(0),
+  fats: z.number().optional().default(0),
+  carbs: z.number().optional().default(0),
+  ingredients: z.array(ingredientSchema),
+  steps: z.array(z.string()),
+  tips: z.string().optional(),
+  substitutions: z.array(substitutionSchema).default([])
+});
+
+export type AdaptedRecipe = z.infer<typeof adaptedRecipeResponseSchema>;
+
+export async function adaptRecipe(recipe: Recipe, userIngredients: string[]): Promise<AdaptedRecipe> {
+  const prompt = `You are an experienced chef. The user wants to cook this recipe but doesn't have all ingredients.
+
+ORIGINAL RECIPE:
+Title: ${recipe.title}
+Ingredients: ${recipe.ingredients.map(i => `${i.name} (${i.amount})`).join(", ")}
+Steps: ${recipe.steps.join(" | ")}
+
+USER HAS THESE INGREDIENTS: ${userIngredients.join(", ")}
+
+Your task:
+1. Identify which recipe ingredients the user is MISSING
+2. For each missing ingredient, find a suitable substitute from what the user HAS
+3. If no good substitute exists for a critical ingredient, mark it in substitutions as "replacement": "NOT AVAILABLE"
+4. Adapt the cooking steps if the substitution requires different cooking technique
+
+Respond ONLY in this JSON format:
+{
+  "title": "Recipe title (same or slightly modified)",
+  "shortDescription": "Brief description in 5-7 words",
+  "description": "Full description (2-3 sentences)",
+  "cookingTime": "${recipe.cookingTime}",
+  "calories": ${recipe.calories || 300},
+  "protein": ${recipe.protein || 20},
+  "fats": ${recipe.fats || 10},
+  "carbs": ${recipe.carbs || 30},
+  "ingredients": [
+    {"name": "Ingredient name", "amount": "quantity"}
+  ],
+  "steps": ["Step 1", "Step 2"],
+  "tips": "Any tips for this adapted version",
+  "substitutions": [
+    {"original": "Original ingredient", "replacement": "What it was replaced with"}
+  ]
+}
+
+Rules:
+- Only include substitutions for ingredients that were actually changed
+- If no changes needed (user has everything), return empty substitutions array
+- Keep the recipe realistic and tasty
+- Adjust quantities if needed for substitutes`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: "You are an experienced chef who adapts recipes based on available ingredients. Respond only in JSON format."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    response_format: { type: "json_object" },
+    max_tokens: 2048
+  });
+
+  const content = response.choices[0].message.content;
+  if (!content) {
+    throw new Error("Empty response from OpenAI");
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch (e) {
+    console.error("Failed to parse OpenAI response:", content);
+    throw new Error("Invalid JSON response from AI");
+  }
+  
+  const validationResult = adaptedRecipeResponseSchema.safeParse(parsed);
+  
+  if (!validationResult.success) {
+    console.error("Invalid adapted recipe structure:", validationResult.error);
+    throw new Error("Invalid recipe format from AI");
+  }
+  
+  return validationResult.data;
+}
 
 export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]> {
   const { ingredients, cookingTime, mealType, skillLevel, foodType, userPreferences } = request;
