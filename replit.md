@@ -102,7 +102,8 @@ CREATE TABLE recipes (
 4. If < 5 recipes found, falls back to ChatGPT generation
 
 ## User Preferences
-- Language: English (all UI and recipes)
+- Communication with user: Russian
+- Service language: English (all UI, code, recipes, error messages)
 - Theme: Green color scheme (primary: hsl(145 63% 42%))
 
 ## Development
