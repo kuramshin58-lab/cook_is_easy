@@ -26,15 +26,15 @@ export default function Login() {
     onSuccess: (data) => {
       setUser(data.user);
       toast({
-        title: "Добро пожаловать!",
-        description: `Рады видеть вас снова, ${data.user.name}`,
+        title: "Welcome back!",
+        description: `Good to see you again, ${data.user.name}`,
       });
       setLocation("/");
     },
     onError: (error: Error) => {
       toast({
-        title: "Ошибка входа",
-        description: error.message || "Неверный email или пароль",
+        title: "Login failed",
+        description: error.message || "Invalid email or password",
         variant: "destructive",
       });
     },
@@ -44,7 +44,7 @@ export default function Login() {
     e.preventDefault();
     if (!email || !password) {
       toast({
-        title: "Заполните все поля",
+        title: "Please fill in all fields",
         variant: "destructive",
       });
       return;
@@ -59,14 +59,14 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
             <ChefHat className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">Вход в аккаунт</h1>
+          <h1 className="text-2xl font-bold">Sign In</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Войдите в свой аккаунт</CardTitle>
+            <CardTitle>Sign in to your account</CardTitle>
             <CardDescription>
-              Введите email и пароль для входа
+              Enter your email and password to continue
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -83,11 +83,11 @@ export default function Login() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Пароль</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Ваш пароль"
+                  placeholder="Your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   data-testid="input-password"
@@ -100,21 +100,21 @@ export default function Login() {
                 data-testid="button-login-submit"
               >
                 <LogIn className="h-4 w-4" />
-                {loginMutation.isPending ? "Вход..." : "Войти"}
+                {loginMutation.isPending ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           </CardContent>
         </Card>
 
         <p className="text-center text-sm text-muted-foreground mt-4">
-          Нет аккаунта?{" "}
+          Don't have an account?{" "}
           <Button
             variant="ghost"
             className="p-0 h-auto underline"
             onClick={() => setLocation("/register")}
             data-testid="link-register"
           >
-            Зарегистрироваться
+            Sign Up
           </Button>
         </p>
       </div>

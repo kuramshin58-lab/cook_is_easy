@@ -91,13 +91,13 @@ export default function Profile() {
       setUser(data.user);
       
       toast({
-        title: "Сохранено",
-        description: "Ваш профиль успешно обновлён"
+        title: "Saved",
+        description: "Your profile has been updated successfully"
       });
     } catch (error) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось сохранить изменения",
+        title: "Error",
+        description: "Failed to save changes",
         variant: "destructive"
       });
     } finally {
@@ -108,7 +108,7 @@ export default function Profile() {
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold" data-testid="text-profile-title">Личный кабинет</h1>
+        <h1 className="text-2xl font-bold" data-testid="text-profile-title">My Profile</h1>
         {hasChanges && (
           <Button onClick={handleSave} disabled={isSaving} data-testid="button-save-profile">
             {isSaving ? (
@@ -116,7 +116,7 @@ export default function Profile() {
             ) : (
               <Save className="h-4 w-4 mr-2" />
             )}
-            Сохранить изменения
+            Save Changes
           </Button>
         )}
       </div>
@@ -126,12 +126,12 @@ export default function Profile() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Информация о пользователе
+              User Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm text-muted-foreground">Имя</label>
+              <label className="text-sm text-muted-foreground">Name</label>
               <p className="text-lg font-medium" data-testid="text-user-name">{user.name}</p>
             </div>
             <div>
@@ -145,12 +145,12 @@ export default function Profile() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ChefHat className="h-5 w-5" />
-              Базовые продукты
+              Pantry Staples
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Продукты, которые у вас всегда есть дома. Они будут учитываться при подборе рецептов.
+              Ingredients you always have at home. These will be considered when suggesting recipes.
             </p>
             
             <div className="flex flex-wrap gap-2" data-testid="list-base-ingredients">
@@ -175,7 +175,7 @@ export default function Profile() {
 
             <div className="flex gap-2">
               <Input
-                placeholder="Добавить свой продукт..."
+                placeholder="Add custom ingredient..."
                 value={customIngredient}
                 onChange={(e) => setCustomIngredient(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addCustomIngredient()}
@@ -193,7 +193,7 @@ export default function Profile() {
             </div>
 
             <div>
-              <p className="text-sm font-medium mb-2">Популярные базовые продукты:</p>
+              <p className="text-sm font-medium mb-2">Popular pantry staples:</p>
               <div className="flex flex-wrap gap-2">
                 {baseIngredientsOptions.map((item) => (
                   <Badge
@@ -215,12 +215,12 @@ export default function Profile() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Utensils className="h-5 w-5" />
-              Оборудование для готовки
+              Cooking Equipment
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Что у вас есть для приготовления блюд. Рецепты будут подбираться с учётом этого оборудования.
+              What cooking tools you have. Recipes will be suggested based on this equipment.
             </p>
             
             <div className="flex flex-wrap gap-2" data-testid="list-equipment">
@@ -243,12 +243,12 @@ export default function Profile() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5" />
-              Предпочтения в еде
+              Food Preferences
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <p className="text-sm font-medium mb-3">Любимые кухни:</p>
+              <p className="text-sm font-medium mb-3">Favorite cuisines:</p>
               <div className="flex flex-wrap gap-2" data-testid="list-cuisine-preferences">
                 {cuisinePreferencesOptions.map((item) => (
                   <Badge
@@ -265,7 +265,7 @@ export default function Profile() {
             </div>
 
             <div>
-              <p className="text-sm font-medium mb-3">Тип питания:</p>
+              <p className="text-sm font-medium mb-3">Diet type:</p>
               <div className="flex flex-wrap gap-2" data-testid="list-diet-preferences">
                 {dietPreferencesOptions.map((item) => (
                   <Badge

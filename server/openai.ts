@@ -8,97 +8,97 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
 
   const ingredientsList = ingredients.join(", ");
   
-  let prompt = `Ты опытный шеф-повар и фуд-редактор. Твоя задача — придумать 5 реально интересных и разнообразных рецептов под запрос пользователя, чтобы это было вкусно и выполнимо дома, используя следующие ингредиенты: ${ingredientsList}.
+  let prompt = `You are an experienced chef and food editor. Your task is to create 5 interesting and diverse recipes that are tasty and achievable at home, using the following ingredients: ${ingredientsList}.
 
-Требования:
-- Время приготовления каждого блюда должно быть не более ${cookingTime} минут`;
+Requirements:
+- Cooking time for each dish must be no more than ${cookingTime} minutes`;
 
   if (mealType) {
-    prompt += `\n- Тип блюда: ${mealType}`;
+    prompt += `\n- Meal type: ${mealType}`;
   }
 
   if (skillLevel) {
-    if (skillLevel === "Новичок") {
-      prompt += `\n- Уровень сложности: простые рецепты для начинающих, минимум ингредиентов и шагов, базовые техники`;
-    } else if (skillLevel === "Средний") {
-      prompt += `\n- Уровень сложности: средний, можно использовать более сложные техники и больше ингредиентов`;
-    } else if (skillLevel === "Мишлен") {
-      prompt += `\n- Уровень сложности: высокий (ресторанный уровень), изысканные блюда, сложные техники, презентация`;
+    if (skillLevel === "Beginner") {
+      prompt += `\n- Skill level: simple recipes for beginners, minimal ingredients and steps, basic techniques`;
+    } else if (skillLevel === "Intermediate") {
+      prompt += `\n- Skill level: intermediate, can use more complex techniques and more ingredients`;
+    } else if (skillLevel === "Expert") {
+      prompt += `\n- Skill level: advanced (restaurant quality), sophisticated dishes, complex techniques, presentation`;
     }
   }
 
   if (foodType) {
-    if (foodType === "ПП") {
-      prompt += `\n- Блюда должны быть диетическими, низкокалорийными, полезными для здоровья`;
-    } else if (foodType === "Жирная") {
-      prompt += `\n- Блюда могут быть сытными, калорийными, с использованием масла и жирных продуктов`;
+    if (foodType === "Healthy") {
+      prompt += `\n- Dishes should be healthy, low-calorie, good for health`;
+    } else if (foodType === "Comfort") {
+      prompt += `\n- Dishes can be hearty, calorie-rich, using oil and fatty products`;
     } else {
-      prompt += `\n- Обычные повседневные блюда`;
+      prompt += `\n- Regular everyday dishes`;
     }
   }
 
   if (userPreferences) {
     if (userPreferences.baseIngredients && userPreferences.baseIngredients.length > 0) {
-      prompt += `\n\nУ пользователя всегда есть базовые продукты: ${userPreferences.baseIngredients.join(", ")}. Можешь использовать их в рецептах.`;
+      prompt += `\n\nUser always has these pantry staples: ${userPreferences.baseIngredients.join(", ")}. You can use them in recipes.`;
     }
     
     if (userPreferences.equipment && userPreferences.equipment.length > 0) {
-      prompt += `\n\nДоступное оборудование для готовки: ${userPreferences.equipment.join(", ")}. Учитывай это при составлении рецептов.`;
+      prompt += `\n\nAvailable cooking equipment: ${userPreferences.equipment.join(", ")}. Consider this when creating recipes.`;
     }
     
     if (userPreferences.foodPreferences && userPreferences.foodPreferences.length > 0) {
-      prompt += `\n\nПредпочтения пользователя в еде: ${userPreferences.foodPreferences.join(", ")}. Постарайся учесть эти предпочтения.`;
+      prompt += `\n\nUser's food preferences: ${userPreferences.foodPreferences.join(", ")}. Try to incorporate these preferences.`;
     }
   }
 
   prompt += `
 
-Ответ должен быть в формате JSON:
+Response must be in JSON format:
 {
   "recipes": [
     {
-      "title": "Название блюда",
-      "shortDescription": "Очень краткое описание в 5-7 слов (для карточки превью)",
-      "description": "Полное описание блюда (2-3 предложения)",
-      "cookingTime": "X мин",
+      "title": "Dish name",
+      "shortDescription": "Very brief description in 5-7 words (for preview card)",
+      "description": "Full description of the dish (2-3 sentences)",
+      "cookingTime": "X min",
       "calories": 350,
       "protein": 25,
       "fats": 15,
       "carbs": 30,
       "ingredients": [
-        {"name": "Название продукта", "amount": "количество (например, 200 г или 2 шт)"}
+        {"name": "Ingredient name", "amount": "quantity (e.g., 200g or 2 pcs)"}
       ],
-      "steps": ["Шаг 1", "Шаг 2", "Шаг 3"],
-      "tips": "Полезный совет по приготовлению (опционально)"
+      "steps": ["Step 1", "Step 2", "Step 3"],
+      "tips": "Helpful cooking tip (optional)"
     }
   ]
 }
 
-Правила качества (очень важно):
+Quality rules (very important):
 
-1. Не предлагай банальные варианты вроде "просто куриная грудка + гречка" без оригинальной идеи.
+1. Don't suggest bland options like "just chicken breast + rice" without an original twist.
 
-2. Все 5 рецептов должны быть заметно разными по формату, вкусу и методу готовки. Не повторяй один и тот же шаблон (например, 5 вариаций "жарим и подаём").
+2. All 5 recipes must be noticeably different in format, taste, and cooking method. Don't repeat the same template (e.g., 5 variations of "fry and serve").
 
-3. В каждом рецепте должна быть одна чёткая ключевая идея, которая отличает его от стандартного домашнего блюда. Укажи её короткой фразой в description или tips.
+3. Each recipe should have one clear key idea that distinguishes it from a standard home dish. Mention it briefly in description or tips.
 
-4. Используй только реалистичные дополнительные ингредиенты (максимум 5 "небазовых" на рецепт). Если добавляешь что-то нестандартное — предлагай простую замену в tips.
+4. Use only realistic additional ingredients (max 5 "non-basic" per recipe). If adding something unusual, suggest a simple substitute in tips.
 
-5. Время приготовления должно быть реальным и укладываться в указанный лимит.
+5. Cooking time must be realistic and fit within the specified limit.
 
-6. Шаги должны быть понятными для человека без опыта: короткие, конкретные, без профессионального жаргона (или с пояснением).
+6. Steps should be understandable for someone without experience: short, specific, without professional jargon (or with explanation).
 
-7. Обязательно укажи калорийность (calories) и БЖУ (protein, fats, carbs) на порцию в числовом формате.
+7. Always include calories and macros (protein, fats, carbs) per serving in numeric format.
 
-8. Рецепты должны быть реальными и основанными на известных блюдах/подходах (котлеты, тефтели, запеканка, оладьи, боул, салат, суп, паста, фриттата и т.д.). Не выдумывай "авторские" блюда и несуществующие названия. Названия должны звучать как реальные блюда из кухни/домашней готовки.
+8. Recipes must be real and based on known dishes/approaches (meatballs, casserole, pancakes, bowl, salad, soup, pasta, frittata, etc.). Don't invent "author's" dishes or non-existent names. Names should sound like real dishes from a kitchen/home cooking.
 
-Технические требования к формату:
-- В поле "name" ингредиента указывай только название продукта (без количества)
-- В поле "amount" указывай количество (граммы, штуки, ложки и т.д.)
-- Используй указанные ингредиенты и базовые продукты пользователя`;
+Technical format requirements:
+- In the "name" field of ingredients, specify only the product name (without quantity)
+- In the "amount" field, specify the quantity (grams, pieces, tablespoons, etc.)
+- Use the specified ingredients and user's pantry staples`;
 
-  console.log("\n=== ЗАПРОС В CHATGPT ===");
-  console.log("Промпт:", prompt);
+  console.log("\n=== CHATGPT REQUEST ===");
+  console.log("Prompt:", prompt);
   console.log("========================\n");
 
   const response = await openai.chat.completions.create({
@@ -106,7 +106,7 @@ export async function generateRecipes(request: RecipeRequest): Promise<Recipe[]>
     messages: [
       {
         role: "system",
-        content: "Ты опытный шеф-повар и фуд-редактор. Создаёшь интересные, разнообразные и выполнимые дома рецепты. Отвечай только в формате JSON."
+        content: "You are an experienced chef and food editor. You create interesting, diverse, and achievable home recipes. Respond only in JSON format."
       },
       {
         role: "user",

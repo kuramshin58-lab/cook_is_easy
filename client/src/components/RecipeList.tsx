@@ -6,16 +6,16 @@ import { UtensilsCrossed, AlertCircle, ChefHat } from "lucide-react";
 import type { Recipe } from "@shared/schema";
 
 const loadingPhrases = [
-  "Разогреваем сковородку…",
-  "Точим ножи…",
-  "Достаём любимую тарелку…",
-  "Смешиваем идеи в миске…",
-  "Проверяем, что есть специи…",
-  "Ставим воду закипать…",
-  "Отмеряем «щепотку магии»…",
-  "Пробуем соус на вкус…",
-  "Хрустим луком (мысленно)…",
-  "Финально собираем рецепт…",
+  "Heating up the pan…",
+  "Sharpening the knives…",
+  "Getting your favorite plate…",
+  "Mixing ideas in a bowl…",
+  "Checking for spices…",
+  "Boiling the water…",
+  "Adding a pinch of magic…",
+  "Tasting the sauce…",
+  "Chopping onions (mentally)…",
+  "Putting together your recipe…",
 ];
 
 interface RecipeListProps {
@@ -53,7 +53,7 @@ function CookingLoadingAnimation() {
         </div>
       </div>
       
-      <h3 className="text-lg font-semibold mb-2">Готовим ваши рецепты</h3>
+      <h3 className="text-lg font-semibold mb-2">Preparing your recipes</h3>
       
       <div className="h-8 flex items-center justify-center">
         <p 
@@ -102,9 +102,9 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
         <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-4">
           <UtensilsCrossed className="h-8 w-8 text-primary" />
         </div>
-        <h3 className="font-medium mb-1">Добавьте продукты</h3>
+        <h3 className="font-medium mb-1">Add ingredients</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          Выберите ингредиенты, которые у вас есть, настройте фильтры и нажмите "Показать рецепты"
+          Select the ingredients you have, set your filters, and click "Find Recipes"
         </p>
       </div>
     );
@@ -116,9 +116,9 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
           <UtensilsCrossed className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="font-medium mb-1">Рецепты не найдены</h3>
+        <h3 className="font-medium mb-1">No recipes found</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          Попробуйте добавить больше продуктов или изменить фильтры
+          Try adding more ingredients or changing your filters
         </p>
       </div>
     );
@@ -128,7 +128,7 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
     <>
       <div className="space-y-4" data-testid="recipe-list">
         <p className="text-sm text-muted-foreground">
-          Найдено рецептов: {recipes.length}
+          Recipes found: {recipes.length}
         </p>
         {recipes.map((recipe, index) => (
           <RecipePreviewCard 

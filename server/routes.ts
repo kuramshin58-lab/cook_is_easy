@@ -31,7 +31,7 @@ export async function registerRoutes(
         .single();
 
       if (existingUser) {
-        return res.status(400).json({ error: "Пользователь с таким email уже существует" });
+        return res.status(400).json({ error: "A user with this email already exists" });
       }
 
       const password_hash = await bcrypt.hash(password, 10);
@@ -53,7 +53,7 @@ export async function registerRoutes(
         console.error("Supabase insert error:", error);
         console.error("Error details:", JSON.stringify(error, null, 2));
         return res.status(500).json({ 
-          error: "Ошибка при создании пользователя",
+          error: "Error creating user",
           details: error.message || "Unknown error"
         });
       }
@@ -61,7 +61,7 @@ export async function registerRoutes(
       return res.json({ user: newUser });
     } catch (error) {
       console.error("Error registering user:", error);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      return res.status(500).json({ error: "Server error" });
     }
   });
 
@@ -85,13 +85,13 @@ export async function registerRoutes(
         .single();
 
       if (error || !user) {
-        return res.status(401).json({ error: "Неверный email или пароль" });
+        return res.status(401).json({ error: "Invalid email or password" });
       }
 
       const isValidPassword = await bcrypt.compare(password, user.password_hash);
 
       if (!isValidPassword) {
-        return res.status(401).json({ error: "Неверный email или пароль" });
+        return res.status(401).json({ error: "Invalid email or password" });
       }
 
       const { password_hash: _, ...userWithoutPassword } = user;
@@ -99,7 +99,7 @@ export async function registerRoutes(
       return res.json({ user: userWithoutPassword });
     } catch (error) {
       console.error("Error logging in:", error);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      return res.status(500).json({ error: "Server error" });
     }
   });
 
@@ -129,17 +129,17 @@ export async function registerRoutes(
 
       if (error) {
         console.error("Supabase update error:", error);
-        return res.status(500).json({ error: "Ошибка при обновлении профиля" });
+        return res.status(500).json({ error: "Error updating profile" });
       }
 
       if (!updatedUser) {
-        return res.status(404).json({ error: "Пользователь не найден" });
+        return res.status(404).json({ error: "User not found" });
       }
 
       return res.json({ user: updatedUser });
     } catch (error) {
       console.error("Error updating profile:", error);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      return res.status(500).json({ error: "Server error" });
     }
   });
 
@@ -156,26 +156,26 @@ export async function registerRoutes(
 
       const request = validationResult.data;
       
-      console.log("\n=== ГИБРИДНЫЙ ПОИСК РЕЦЕПТОВ ===");
-      console.log("1. Ищем в базе данных...");
+      console.log("\n=== HYBRID RECIPE SEARCH ===");
+      console.log("1. Searching database...");
       
       const { recipes: dbRecipes, foundEnough } = await searchRecipesInDatabase(request, 5);
       
-      console.log(`   Найдено в базе: ${dbRecipes.length} рецептов`);
+      console.log(`   Found in database: ${dbRecipes.length} recipes`);
       
       if (foundEnough) {
-        console.log("   Достаточно результатов из базы, ChatGPT не нужен");
+        console.log("   Enough results from database, ChatGPT not needed");
         console.log("================================\n");
         return res.json({ recipes: dbRecipes, source: "database" });
       }
       
-      console.log("2. Недостаточно рецептов в базе, запрашиваем ChatGPT...");
+      console.log("2. Not enough recipes in database, requesting ChatGPT...");
       
       const aiRecipes = await generateRecipes(request);
       
       const allRecipes = [...dbRecipes, ...aiRecipes].slice(0, 5);
       
-      console.log(`   Итого: ${dbRecipes.length} из базы + ${aiRecipes.length} от AI`);
+      console.log(`   Total: ${dbRecipes.length} from database + ${aiRecipes.length} from AI`);
       console.log("================================\n");
       
       return res.json({ 

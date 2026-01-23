@@ -16,110 +16,21 @@ interface DbRecipe {
   source_url: string;
 }
 
-// Словарь перевода русских ингредиентов на английские ключевые слова
-const ingredientTranslations: Record<string, string[]> = {
-  // Паста и макароны
-  'макароны': ['pasta', 'penne', 'spaghetti', 'macaroni', 'noodle', 'fettuccine', 'linguine', 'rigatoni'],
-  'паста': ['pasta', 'penne', 'spaghetti', 'noodle', 'fettuccine', 'linguine'],
-  'спагетти': ['spaghetti', 'pasta'],
-  'пенне': ['penne', 'pasta'],
-  'лапша': ['noodle', 'pasta'],
-  
-  // Мясо
-  'курица': ['chicken', 'poultry'],
-  'куриная грудка': ['chicken breast', 'chicken'],
-  'куриное филе': ['chicken breast', 'chicken'],
-  'говядина': ['beef', 'steak'],
-  'свинина': ['pork', 'bacon'],
-  'бекон': ['bacon', 'pork'],
-  'фарш': ['ground', 'mince', 'beef', 'meat'],
-  
-  // Овощи
-  'картошка': ['potato', 'potatoes'],
-  'картофель': ['potato', 'potatoes'],
-  'помидоры': ['tomato', 'tomatoes', 'cherry tomatoes'],
-  'томаты': ['tomato', 'tomatoes'],
-  'лук': ['onion', 'onions'],
-  'чеснок': ['garlic'],
-  'морковь': ['carrot', 'carrots'],
-  'перец': ['pepper', 'bell pepper'],
-  'болгарский перец': ['bell pepper', 'pepper'],
-  'брокколи': ['broccoli'],
-  'шпинат': ['spinach'],
-  'тыква': ['pumpkin', 'squash', 'butternut'],
-  'баклажан': ['eggplant', 'aubergine'],
-  'кабачок': ['zucchini', 'courgette'],
-  'огурец': ['cucumber'],
-  'капуста': ['cabbage'],
-  'грибы': ['mushroom', 'mushrooms', 'porcini'],
-  
-  // Молочные продукты
-  'сливки': ['cream', 'heavy cream'],
-  'молоко': ['milk'],
-  'сыр': ['cheese'],
-  'пармезан': ['parmesan', 'cheese'],
-  'моцарелла': ['mozzarella', 'cheese'],
-  'фета': ['feta', 'cheese'],
-  'сметана': ['sour cream'],
-  'йогурт': ['yogurt'],
-  'масло сливочное': ['butter'],
-  
-  // Другое
-  'яйца': ['egg', 'eggs'],
-  'яйцо': ['egg', 'eggs'],
-  'рис': ['rice', 'basmati'],
-  'мука': ['flour'],
-  'хлеб': ['bread'],
-  'оливковое масло': ['olive oil'],
-  'лимон': ['lemon'],
-  'чили': ['chili', 'chilli'],
-  'базилик': ['basil'],
-  'орегано': ['oregano'],
-  'петрушка': ['parsley'],
-  'кинза': ['cilantro', 'coriander'],
-  'имбирь': ['ginger'],
-  'соевый соус': ['soy sauce'],
-};
-
-function translateIngredient(ingredient: string): string[] {
-  const lower = ingredient.toLowerCase().trim();
-  
-  // Проверяем полное совпадение
-  if (ingredientTranslations[lower]) {
-    return ingredientTranslations[lower];
-  }
-  
-  // Проверяем частичное совпадение
-  for (const [russian, english] of Object.entries(ingredientTranslations)) {
-    if (lower.includes(russian) || russian.includes(lower)) {
-      return english;
-    }
-  }
-  
-  return [];
-}
-
 function normalizeIngredient(ingredient: string): string[] {
-  const baseTokens = ingredient
+  return ingredient
     .toLowerCase()
     .replace(/[.,!?]/g, '')
     .split(/\s+/)
     .filter(word => word.length > 2);
-  
-  // Добавляем переводы на английский
-  const translations = translateIngredient(ingredient);
-  
-  return [...baseTokens, ...translations];
 }
 
-// Ингредиенты которые "специальные" - дают бустер если совпадают
 const specialIngredients = [
-  'тыква', 'pumpkin', 'squash', 'butternut',
-  'сливки', 'cream',
-  'грибы', 'mushroom', 
-  'шпинат', 'spinach',
-  'баклажан', 'eggplant',
-  'кабачок', 'zucchini'
+  'pumpkin', 'squash', 'butternut',
+  'cream', 'heavy cream',
+  'mushroom', 'mushrooms',
+  'spinach',
+  'eggplant', 'aubergine',
+  'zucchini', 'courgette'
 ];
 
 function calculateMatchScore(recipeIngredients: string[], userIngredients: string[]): number {
@@ -127,7 +38,6 @@ function calculateMatchScore(recipeIngredients: string[], userIngredients: strin
     userIngredients.flatMap(ing => normalizeIngredient(ing))
   );
   
-  // Проверяем какие специальные ингредиенты ввёл пользователь
   const userSpecialTokens = new Set(
     Array.from(userTokens).filter(token => 
       specialIngredients.some(special => token.includes(special) || special.includes(token))
@@ -151,7 +61,6 @@ function calculateMatchScore(recipeIngredients: string[], userIngredients: strin
     if (hasMatch) {
       matchedCount++;
       
-      // Проверяем совпадение специальных ингредиентов
       const isSpecialMatch = recipeTokens.some(token =>
         Array.from(userSpecialTokens).some(special => 
           token.includes(special) || special.includes(token)
@@ -167,30 +76,17 @@ function calculateMatchScore(recipeIngredients: string[], userIngredients: strin
     ? matchedCount / recipeIngredients.length 
     : 0;
   
-  // Бустер за специальные ингредиенты (до +30%)
   const specialBoost = specialMatches > 0 ? 0.3 : 0;
   
   return Math.min(1, baseScore + specialBoost);
 }
 
-function mapDifficultyToSkillLevel(difficulty: string): string {
-  switch (difficulty.toLowerCase()) {
-    case 'easy': return 'Новичок';
-    case 'medium': return 'Средний';
-    case 'hard': return 'Мишлен';
-    default: return 'Средний';
-  }
-}
-
 function mapSkillLevelToDifficulties(skillLevel: string | undefined): string[] {
   if (!skillLevel) return [];
   switch (skillLevel) {
-    // Новичок - только лёгкие
-    case 'Новичок': return ['Easy', 'easy', 'Легко', 'Простой'];
-    // Средний - лёгкие и средние
-    case 'Средний': return ['Easy', 'easy', 'Легко', 'Простой', 'Medium', 'medium', 'Средний', 'Средне'];
-    // Мишлен - все уровни
-    case 'Мишлен': return ['Easy', 'easy', 'Легко', 'Hard', 'hard', 'Сложный', 'Сложно', 'Medium', 'medium', 'Средний'];
+    case 'Beginner': return ['Easy', 'easy'];
+    case 'Intermediate': return ['Easy', 'easy', 'Medium', 'medium'];
+    case 'Expert': return ['Easy', 'easy', 'Medium', 'medium', 'Hard', 'hard'];
     default: return [];
   }
 }
@@ -211,7 +107,7 @@ function convertDbRecipeToRecipe(dbRecipe: DbRecipe, matchScore: number, userIng
       return false;
     });
     
-    const parts = ing.match(/^([\d.,\s]+(?:g|г|ml|мл|tbsp|ст\.?л\.?|tsp|ч\.?л\.?|cloves?|шт\.?|pieces?|bunch|пучок)?)\s*(.+)$/i);
+    const parts = ing.match(/^([\d.,\s]+(?:g|ml|tbsp|tsp|cloves?|pieces?|bunch)?)\s*(.+)$/i);
     if (parts && parts[2]) {
       return { name: parts[2].trim(), amount: parts[1].trim(), available: isAvailable };
     }
@@ -234,14 +130,14 @@ function convertDbRecipeToRecipe(dbRecipe: DbRecipe, matchScore: number, userIng
     title: dbRecipe.title,
     shortDescription: dbRecipe.description.slice(0, 60) + (dbRecipe.description.length > 60 ? '...' : ''),
     description: dbRecipe.description,
-    cookingTime: `${dbRecipe.prep_time + dbRecipe.cook_time} мин`,
+    cookingTime: `${dbRecipe.prep_time + dbRecipe.cook_time} min`,
     calories: dbRecipe.calories,
     protein: Math.round(dbRecipe.calories * 0.15 / 4),
     fats: Math.round(dbRecipe.calories * 0.30 / 9),
     carbs: Math.round(dbRecipe.calories * 0.55 / 4),
     ingredients,
     steps: steps.length > 0 ? steps : [dbRecipe.instructions],
-    tips: `Рецепт из базы данных. Совпадение ингредиентов: ${Math.round(matchScore * 100)}%`,
+    tips: `Recipe from database. Ingredient match: ${Math.round(matchScore * 100)}%`,
     matchPercentage: Math.round(matchScore * 100),
     isFromDatabase: true
   };
@@ -277,10 +173,10 @@ export async function searchRecipesInDatabase(
     ...(request.userPreferences?.baseIngredients || [])
   ];
   
-  console.log('=== ОТЛАДКА ПОИСКА ===');
-  console.log('Введённые ингредиенты:', allIngredients);
-  console.log('Токены пользователя:', allIngredients.flatMap(ing => normalizeIngredient(ing)));
-  console.log('Макс время:', maxTime, 'Сложность:', allowedDifficulties);
+  console.log('=== SEARCH DEBUG ===');
+  console.log('User ingredients:', allIngredients);
+  console.log('User tokens:', allIngredients.flatMap(ing => normalizeIngredient(ing)));
+  console.log('Max time:', maxTime, 'Difficulty:', allowedDifficulties);
   
   const scoredRecipes = recipes
     .map((recipe: DbRecipe) => {
@@ -289,9 +185,8 @@ export async function searchRecipesInDatabase(
       const matchesDifficulty = allowedDifficulties.length === 0 || 
         allowedDifficulties.some(d => recipe.difficulty.toLowerCase().includes(d.toLowerCase()));
       
-      // Логируем рецепты с тыквой/pumpkin
       if (recipe.ingredients.some(i => i.toLowerCase().includes('pumpkin') || i.toLowerCase().includes('squash'))) {
-        console.log(`ТЫКВА: "${recipe.title}" score=${score.toFixed(2)} time=${totalTime} diff=${recipe.difficulty} matchDiff=${matchesDifficulty}`);
+        console.log(`PUMPKIN: "${recipe.title}" score=${score.toFixed(2)} time=${totalTime} diff=${recipe.difficulty} matchDiff=${matchesDifficulty}`);
       }
       
       return { recipe, score, totalTime, matchesDifficulty };

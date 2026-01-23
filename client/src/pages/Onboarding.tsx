@@ -34,13 +34,11 @@ export default function Onboarding() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
-  // Step 2: ingredient search and recommendations
   const [ingredientSearch, setIngredientSearch] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [recommendationIndex, setRecommendationIndex] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Close suggestions on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -51,7 +49,6 @@ export default function Onboarding() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Get 5 visible recommendations (not already selected)
   const visibleRecommendations = useMemo(() => {
     const notSelected = baseIngredientsOptions.filter(
       (item) => !baseIngredients.includes(item)
@@ -59,7 +56,6 @@ export default function Onboarding() {
     return notSelected.slice(recommendationIndex, recommendationIndex + 5);
   }, [baseIngredients, recommendationIndex]);
 
-  // Filter all ingredients for search
   const filteredIngredients = useMemo(() => {
     if (!ingredientSearch.trim()) return [];
     const query = ingredientSearch.toLowerCase();
@@ -86,7 +82,6 @@ export default function Onboarding() {
 
   const selectRecommendation = (item: string) => {
     addIngredient(item);
-    // Move to next recommendation
     const remaining = baseIngredientsOptions.filter(
       (i) => !baseIngredients.includes(i) && i !== item
     );
@@ -112,15 +107,15 @@ export default function Onboarding() {
     onSuccess: (data) => {
       setUser(data.user);
       toast({
-        title: "Регистрация успешна!",
-        description: "Добро пожаловать в сервис рецептов",
+        title: "Registration successful!",
+        description: "Welcome to the recipe finder",
       });
       setLocation("/");
     },
     onError: (error: Error) => {
       toast({
-        title: "Ошибка регистрации",
-        description: error.message || "Попробуйте еще раз",
+        title: "Registration failed",
+        description: error.message || "Please try again",
         variant: "destructive",
       });
     },
@@ -153,8 +148,8 @@ export default function Onboarding() {
   const handleSubmit = () => {
     if (!name || !email || !password) {
       toast({
-        title: "Заполните все поля",
-        description: "Имя, email и пароль обязательны",
+        title: "Please fill in all fields",
+        description: "Name, email and password are required",
         variant: "destructive",
       });
       return;
@@ -179,10 +174,10 @@ export default function Onboarding() {
           <div className="text-center mb-8">
             <Progress value={progress} className="h-1.5 mb-4" />
             <div className="flex justify-between items-center mb-6">
-              <span className="text-sm text-muted-foreground">Шаг {step} из 5</span>
+              <span className="text-sm text-muted-foreground">Step {step} of 5</span>
               {step > 1 && (
                 <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} className="text-muted-foreground">
-                  Пропустить
+                  Skip
                 </Button>
               )}
             </div>
@@ -194,23 +189,23 @@ export default function Onboarding() {
                 <ChefHat className="h-10 w-10 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold mb-2">Добро пожаловать!</h1>
+                <h1 className="text-2xl font-bold mb-2">Welcome!</h1>
                 <p className="text-muted-foreground">
-                  Настроим персональные рецепты под ваши предпочтения
+                  Let's personalize recipes to match your preferences
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 mt-8">
                 <Card className="p-4 text-center border-0 shadow-sm">
                   <ShoppingBag className="h-6 w-6 mx-auto mb-2 text-primary" />
-                  <p className="text-xs text-muted-foreground">Базовые продукты</p>
+                  <p className="text-xs text-muted-foreground">Pantry staples</p>
                 </Card>
                 <Card className="p-4 text-center border-0 shadow-sm">
                   <Utensils className="h-6 w-6 mx-auto mb-2 text-primary" />
-                  <p className="text-xs text-muted-foreground">Оборудование</p>
+                  <p className="text-xs text-muted-foreground">Equipment</p>
                 </Card>
                 <Card className="p-4 text-center border-0 shadow-sm">
                   <Heart className="h-6 w-6 mx-auto mb-2 text-primary" />
-                  <p className="text-xs text-muted-foreground">Вкусы</p>
+                  <p className="text-xs text-muted-foreground">Preferences</p>
                 </Card>
               </div>
             </div>
@@ -219,18 +214,17 @@ export default function Onboarding() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h1 className="text-2xl font-bold mb-2">Базовые продукты</h1>
+                <h1 className="text-2xl font-bold mb-2">Pantry Staples</h1>
                 <p className="text-muted-foreground text-sm">
-                  Что обычно есть у вас дома?
+                  What do you usually have at home?
                 </p>
               </div>
 
-              {/* Search input */}
               <div className="relative" ref={searchRef}>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Поиск ингредиентов..."
+                    placeholder="Search ingredients..."
                     value={ingredientSearch}
                     onChange={(e) => {
                       setIngredientSearch(e.target.value);
@@ -242,7 +236,6 @@ export default function Onboarding() {
                   />
                 </div>
                 
-                {/* Search suggestions dropdown */}
                 {showSuggestions && filteredIngredients.length > 0 && (
                   <Card className="absolute z-10 w-full mt-1 max-h-64 overflow-y-auto shadow-lg border">
                     {filteredIngredients.map((item) => (
@@ -260,10 +253,9 @@ export default function Onboarding() {
                 )}
               </div>
 
-              {/* Selected ingredients */}
               {baseIngredients.length > 0 && (
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Выбрано: {baseIngredients.length}</Label>
+                  <Label className="text-xs text-muted-foreground">Selected: {baseIngredients.length}</Label>
                   <div className="flex flex-wrap gap-2">
                     {baseIngredients.map((item) => (
                       <Badge
@@ -282,9 +274,8 @@ export default function Onboarding() {
                 </div>
               )}
 
-              {/* Recommendations - only 5 visible */}
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Рекомендуем добавить</Label>
+                <Label className="text-xs text-muted-foreground">Recommended</Label>
                 <div className="flex flex-wrap gap-2">
                   {visibleRecommendations.map((item) => (
                     <Badge
@@ -306,9 +297,9 @@ export default function Onboarding() {
           {step === 3 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h1 className="text-2xl font-bold mb-2">Оборудование</h1>
+                <h1 className="text-2xl font-bold mb-2">Equipment</h1>
                 <p className="text-muted-foreground text-sm">
-                  Что у вас есть для готовки?
+                  What cooking tools do you have?
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -339,14 +330,14 @@ export default function Onboarding() {
           {step === 4 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h1 className="text-2xl font-bold mb-2">Предпочтения</h1>
+                <h1 className="text-2xl font-bold mb-2">Preferences</h1>
                 <p className="text-muted-foreground text-sm">
-                  Какую еду вы любите?
+                  What kind of food do you like?
                 </p>
               </div>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Кухня</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Cuisine</Label>
                   <div className="flex flex-wrap gap-2">
                     {cuisinePreferencesOptions.map((item) => {
                       const isSelected = foodPreferences.includes(item);
@@ -370,7 +361,7 @@ export default function Onboarding() {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Тип питания</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Diet</Label>
                   <div className="flex flex-wrap gap-2">
                     {dietPreferencesOptions.map((item) => {
                       const isSelected = foodPreferences.includes(item);
@@ -403,18 +394,18 @@ export default function Onboarding() {
                 <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Sparkles className="h-8 w-8 text-primary" />
                 </div>
-                <h1 className="text-2xl font-bold mb-2">Создайте аккаунт</h1>
+                <h1 className="text-2xl font-bold mb-2">Create Account</h1>
                 <p className="text-muted-foreground text-sm">
-                  Последний шаг к персональным рецептам
+                  Last step to personalized recipes
                 </p>
               </div>
               <Card className="p-6 border-0 shadow-md">
                 <CardContent className="p-0 space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm">Имя</Label>
+                    <Label htmlFor="name" className="text-sm">Name</Label>
                     <Input
                       id="name"
-                      placeholder="Как вас зовут?"
+                      placeholder="What's your name?"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="h-12"
@@ -434,11 +425,11 @@ export default function Onboarding() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm">Пароль</Label>
+                    <Label htmlFor="password" className="text-sm">Password</Label>
                     <Input
                       id="password"
                       type="password"
-                      placeholder="Минимум 6 символов"
+                      placeholder="At least 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="h-12"
@@ -469,7 +460,7 @@ export default function Onboarding() {
                 className="flex-1 gap-2"
                 data-testid="button-next"
               >
-                Далее
+                Next
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
@@ -480,20 +471,20 @@ export default function Onboarding() {
                 disabled={registerMutation.isPending}
                 data-testid="button-register"
               >
-                {registerMutation.isPending ? "Регистрация..." : "Создать аккаунт"}
+                {registerMutation.isPending ? "Creating..." : "Create Account"}
               </Button>
             )}
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Уже есть аккаунт?{" "}
+            Already have an account?{" "}
             <Button
               variant="ghost"
               className="p-0 h-auto underline"
               onClick={() => setLocation("/login")}
               data-testid="link-login"
             >
-              Войти
+              Sign In
             </Button>
           </p>
         </div>

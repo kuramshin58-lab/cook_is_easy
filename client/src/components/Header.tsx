@@ -23,7 +23,7 @@ export function Header({ user, onLogout }: HeaderProps) {
             data-testid="link-home"
           >
             <ChefHat className="h-6 w-6 text-primary" />
-            <span className="font-semibold text-lg hidden sm:inline">Рецепты</span>
+            <span className="font-semibold text-lg hidden sm:inline">Recipes</span>
           </button>
           
           <nav className="flex gap-1 bg-muted rounded-lg p-1">
@@ -37,7 +37,7 @@ export function Header({ user, onLogout }: HeaderProps) {
               data-testid="tab-ai-recipes"
             >
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">AI рецепты</span>
+              <span className="hidden sm:inline">AI Recipes</span>
             </button>
             <button
               onClick={() => setLocation("/ready-recipes")}
@@ -49,7 +49,7 @@ export function Header({ user, onLogout }: HeaderProps) {
               data-testid="tab-ready-recipes"
             >
               <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Готовые</span>
+              <span className="hidden sm:inline">Ready</span>
             </button>
           </nav>
         </div>
@@ -75,7 +75,7 @@ export function Header({ user, onLogout }: HeaderProps) {
                 data-testid="button-logout"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Выйти</span>
+                <span className="hidden sm:inline">Log Out</span>
               </Button>
             </>
           ) : (
@@ -87,7 +87,7 @@ export function Header({ user, onLogout }: HeaderProps) {
               data-testid="button-login"
             >
               <LogIn className="h-4 w-4" />
-              Вход
+              Sign In
             </Button>
           )}
         </div>

@@ -17,7 +17,7 @@ function normalizeIngredient(name: string): string {
 function getTokens(str: string): Set<string> {
   return new Set(
     str.toLowerCase()
-      .replace(/[^\wа-яё\s]/gi, '')
+      .replace(/[^\w\s]/gi, '')
       .split(/\s+/)
       .filter(t => t.length > 1)
   );
@@ -50,8 +50,6 @@ function countMatchingIngredients(recipe: Recipe, userIngredients: string[]): nu
 export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: RecipePreviewCardProps) {
   const totalIngredients = recipe.ingredients.length;
   
-  // Используем matchPercentage от бэкенда если есть (для рецептов из базы)
-  // Иначе вычисляем на основе совпадения ингредиентов
   const backendMatchPercentage = recipe.matchPercentage;
   const matchingCount = backendMatchPercentage !== undefined 
     ? Math.round(totalIngredients * backendMatchPercentage / 100)
@@ -98,7 +96,7 @@ export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: R
           
           <div className="ml-auto text-xs font-medium" data-testid={`text-match-percentage-${index}`}>
             <span className={matchPercentage >= 70 ? "text-primary" : "text-muted-foreground"}>
-              {matchPercentage}% совпадение
+              {matchPercentage}% match
             </span>
           </div>
         </div>

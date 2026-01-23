@@ -87,7 +87,7 @@ export function IngredientInput({ selectedIngredients, onAdd, onRemove }: Ingred
             }}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Добавление продуктов..."
+            placeholder="Add ingredients..."
             className="pl-10"
             data-testid="input-ingredient"
           />
@@ -136,7 +136,7 @@ export function IngredientInput({ selectedIngredients, onAdd, onRemove }: Ingred
 
       {selectedIngredients.length > 0 && (
         <div className="mt-6">
-          <p className="text-sm text-muted-foreground mb-3" data-testid="text-selected-label">Выбранные продукты:</p>
+          <p className="text-sm text-muted-foreground mb-3" data-testid="text-selected-label">Selected ingredients:</p>
           <div className="flex flex-wrap gap-2">
             {selectedIngredients.map(ingredient => (
               <Badge
@@ -150,7 +150,7 @@ export function IngredientInput({ selectedIngredients, onAdd, onRemove }: Ingred
                   type="button"
                   onClick={() => onRemove(ingredient)}
                   className="ml-1 hover:text-destructive transition-colors"
-                  aria-label={`Удалить ${ingredient}`}
+                  aria-label={`Remove ${ingredient}`}
                   data-testid={`button-remove-${ingredient}`}
                 >
                   <X className="h-3 w-3" />

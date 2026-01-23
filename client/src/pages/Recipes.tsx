@@ -45,7 +45,7 @@ export default function Recipes() {
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4" />
-            Назад к выбору продуктов
+            Back to ingredient selection
           </Button>
           
           <div className="flex items-center gap-3">
@@ -53,10 +53,10 @@ export default function Recipes() {
               <ChefHat className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Ваши рецепты</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Your Recipes</h1>
               {recipeRequest && (
                 <p className="text-muted-foreground text-sm">
-                  На основе: {recipeRequest.ingredients.join(", ")}
+                  Based on: {recipeRequest.ingredients.join(", ")}
                 </p>
               )}
             </div>
@@ -67,7 +67,7 @@ export default function Recipes() {
           recipes={recipes}
           userIngredients={userIngredients}
           isLoading={generateRecipes.isPending}
-          error={generateRecipes.error ? "Произошла ошибка при генерации рецептов. Попробуйте еще раз." : null}
+          error={generateRecipes.error ? "An error occurred while generating recipes. Please try again." : null}
           hasSearched={true}
         />
 
@@ -78,7 +78,7 @@ export default function Recipes() {
               onClick={() => setLocation("/")}
               data-testid="button-new-search"
             >
-              Новый поиск рецептов
+              New Recipe Search
             </Button>
           </div>
         )}

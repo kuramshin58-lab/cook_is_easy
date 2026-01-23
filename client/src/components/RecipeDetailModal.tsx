@@ -24,7 +24,7 @@ function normalizeIngredient(name: string): string {
 function getTokens(str: string): Set<string> {
   return new Set(
     str.toLowerCase()
-      .replace(/[^\wа-яё\s]/gi, '')
+      .replace(/[^\w\s]/gi, '')
       .split(/\s+/)
       .filter(t => t.length > 1)
   );
@@ -74,7 +74,7 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
                     {recipe.cookingTime}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {availableCount}/{totalCount} ингредиентов
+                    {availableCount}/{totalCount} ingredients
                   </span>
                 </div>
               </div>
@@ -94,30 +94,30 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
                   <CardContent className="p-3 text-center">
                     <Flame className="h-4 w-4 mx-auto mb-1 text-orange-500" />
                     <div className="text-lg font-bold">{recipe.calories}</div>
-                    <div className="text-xs text-muted-foreground">ккал</div>
+                    <div className="text-xs text-muted-foreground">cal</div>
                   </CardContent>
                 </Card>
                 {recipe.protein && (
                   <Card className="border-0 bg-red-50 dark:bg-red-950/30">
                     <CardContent className="p-3 text-center">
-                      <div className="text-lg font-bold text-red-600">{recipe.protein}г</div>
-                      <div className="text-xs text-muted-foreground">белки</div>
+                      <div className="text-lg font-bold text-red-600">{recipe.protein}g</div>
+                      <div className="text-xs text-muted-foreground">protein</div>
                     </CardContent>
                   </Card>
                 )}
                 {recipe.fats && (
                   <Card className="border-0 bg-yellow-50 dark:bg-yellow-950/30">
                     <CardContent className="p-3 text-center">
-                      <div className="text-lg font-bold text-yellow-600">{recipe.fats}г</div>
-                      <div className="text-xs text-muted-foreground">жиры</div>
+                      <div className="text-lg font-bold text-yellow-600">{recipe.fats}g</div>
+                      <div className="text-xs text-muted-foreground">fats</div>
                     </CardContent>
                   </Card>
                 )}
                 {recipe.carbs && (
                   <Card className="border-0 bg-blue-50 dark:bg-blue-950/30">
                     <CardContent className="p-3 text-center">
-                      <div className="text-lg font-bold text-blue-600">{recipe.carbs}г</div>
-                      <div className="text-xs text-muted-foreground">углеводы</div>
+                      <div className="text-lg font-bold text-blue-600">{recipe.carbs}g</div>
+                      <div className="text-xs text-muted-foreground">carbs</div>
                     </CardContent>
                   </Card>
                 )}
@@ -125,7 +125,7 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
             )}
 
             <div>
-              <h4 className="font-semibold mb-3">Ингредиенты</h4>
+              <h4 className="font-semibold mb-3">Ingredients</h4>
               <div className="space-y-2">
                 {recipe.ingredients.map((ingredient, i) => {
                   const hasIngredient = isIngredientAvailable(ingredient.name, userIngredients);
@@ -155,7 +155,7 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
             </div>
 
             <div>
-              <h4 className="font-semibold mb-3">Приготовление</h4>
+              <h4 className="font-semibold mb-3">Instructions</h4>
               <ol className="space-y-4">
                 {recipe.steps.map((step, i) => (
                   <li key={i} className="flex gap-3" data-testid={`step-${i}`}>

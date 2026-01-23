@@ -66,15 +66,15 @@ function RecipeDetailModal({
           
           <div className="grid grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
             <div className="text-center">
-              <div className="text-sm text-muted-foreground">Подготовка</div>
+              <div className="text-sm text-muted-foreground">Prep</div>
               <div className="font-semibold">{recipe.prepTime}</div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-muted-foreground">Готовка</div>
+              <div className="text-sm text-muted-foreground">Cook</div>
               <div className="font-semibold">{recipe.cookingTime}</div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-muted-foreground">Порций</div>
+              <div className="text-sm text-muted-foreground">Servings</div>
               <div className="font-semibold">{recipe.servings}</div>
             </div>
           </div>
@@ -82,7 +82,7 @@ function RecipeDetailModal({
           <div>
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Ингредиенты
+              Ingredients
             </h4>
             <ul className="space-y-1">
               {ingredientsList.map((ingredient, i) => (
@@ -95,7 +95,7 @@ function RecipeDetailModal({
           </div>
           
           <div>
-            <h4 className="font-semibold mb-3">Шаги приготовления</h4>
+            <h4 className="font-semibold mb-3">Instructions</h4>
             <ol className="space-y-3">
               {stepsList.map((step, i) => (
                 <li key={i} className="text-sm flex gap-3">
@@ -128,14 +128,14 @@ export default function ReadyRecipes() {
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4" />
-            Назад
+            Back
           </Button>
           
           <h1 className="text-2xl md:text-3xl font-bold text-center" data-testid="text-page-title">
-            Готовые рецепты
+            Ready Recipes
           </h1>
           <p className="text-muted-foreground text-center mt-2">
-            Подборка проверенных рецептов со всего мира
+            A collection of tested recipes from around the world
           </p>
         </header>
 

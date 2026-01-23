@@ -40,32 +40,32 @@ function Landing() {
   const features = [
     {
       icon: ShoppingBag,
-      title: "Из того, что есть",
-      description: "Рецепты из продуктов в холодильнике"
+      title: "Use What You Have",
+      description: "Recipes from ingredients in your fridge"
     },
     {
       icon: Heart,
-      title: "Персонализация",
-      description: "Учитываем ваши вкусы и предпочтения"
+      title: "Personalization",
+      description: "Tailored to your taste preferences"
     },
     {
       icon: Clock,
-      title: "Экономия времени",
-      description: "Выбирайте время готовки"
+      title: "Save Time",
+      description: "Choose your cooking time"
     },
     {
       icon: Utensils,
-      title: "5 рецептов",
-      description: "Уникальные рецепты от AI"
+      title: "5 Recipes",
+      description: "Unique AI-generated recipes"
     }
   ];
 
   const benefits = [
-    "Не нужно думать, что приготовить",
-    "Рецепты из имеющихся продуктов",
-    "Персонализация под ваши вкусы",
-    "Подробные пошаговые инструкции",
-    "Список недостающих ингредиентов"
+    "No more wondering what to cook",
+    "Recipes from available ingredients",
+    "Personalized to your preferences",
+    "Detailed step-by-step instructions",
+    "List of missing ingredients"
   ];
 
   return (
@@ -76,10 +76,10 @@ function Landing() {
             <ChefHat className="h-10 w-10 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4" data-testid="text-landing-title">
-            Что приготовить сегодня?
+            What to cook today?
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Введите продукты, которые у вас есть, и AI подберёт 5 уникальных рецептов
+            Enter the ingredients you have, and AI will suggest 5 unique recipes
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -88,7 +88,7 @@ function Landing() {
               onClick={() => setLocation("/register")}
               data-testid="button-start-free"
             >
-              Начать бесплатно
+              Get Started Free
               <ArrowRight className="h-4 w-4" />
             </Button>
             <Button 
@@ -97,7 +97,7 @@ function Landing() {
               onClick={() => setLocation("/login")}
               data-testid="button-login-landing"
             >
-              У меня есть аккаунт
+              I have an account
             </Button>
           </div>
         </div>
@@ -106,7 +106,7 @@ function Landing() {
       <section className="bg-muted/30 py-12 md:py-16">
         <div className="container max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
-            Как это работает
+            How It Works
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {features.map((feature, index) => (
@@ -133,7 +133,7 @@ function Landing() {
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="flex-1">
               <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                Преимущества
+                Benefits
               </h2>
               <ul className="space-y-3">
                 {benefits.map((benefit, index) => (
@@ -150,9 +150,9 @@ function Landing() {
               <Card className="bg-primary/5 border-primary/20 shadow-lg">
                 <CardContent className="p-6 text-center">
                   <div className="text-5xl font-bold text-primary mb-2">5</div>
-                  <div className="text-lg font-medium mb-1">уникальных рецептов</div>
+                  <div className="text-lg font-medium mb-1">unique recipes</div>
                   <p className="text-sm text-muted-foreground">
-                    за каждый запрос с учётом ваших предпочтений
+                    per request based on your preferences
                   </p>
                 </CardContent>
               </Card>
@@ -164,10 +164,10 @@ function Landing() {
       <section className="bg-primary/5 py-12 md:py-16">
         <div className="container max-w-2xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Готовы начать?
+            Ready to start?
           </h2>
           <p className="text-muted-foreground mb-8">
-            Зарегистрируйтесь за минуту и получите персональные рецепты
+            Sign up in a minute and get personalized recipes
           </p>
           <Button 
             size="lg" 
@@ -176,7 +176,7 @@ function Landing() {
             data-testid="button-register-bottom"
           >
             <Sparkles className="h-4 w-4" />
-            Создать аккаунт
+            Create Account
           </Button>
         </div>
       </section>
@@ -185,28 +185,28 @@ function Landing() {
 }
 
 const cookingTimeLabels: Record<CookingTime, { label: string; icon: typeof Timer }> = {
-  "20": { label: "20 мин", icon: Timer },
-  "40": { label: "40 мин", icon: Timer },
-  "60": { label: "1 час", icon: Clock },
+  "20": { label: "20 min", icon: Timer },
+  "40": { label: "40 min", icon: Timer },
+  "60": { label: "1 hour", icon: Clock },
 };
 
 const mealTypeLabels: Record<MealType, { label: string; icon: typeof Flame }> = {
-  "Завтрак": { label: "Завтрак", icon: Soup },
-  "Основное блюдо": { label: "Основное блюдо", icon: CookingPot },
-  "Перекус": { label: "Перекус", icon: Utensils },
-  "Салат": { label: "Салат", icon: Salad },
+  "Breakfast": { label: "Breakfast", icon: Soup },
+  "Main Course": { label: "Main Course", icon: CookingPot },
+  "Snack": { label: "Snack", icon: Utensils },
+  "Salad": { label: "Salad", icon: Salad },
 };
 
 const skillLevelLabels: Record<SkillLevel, { label: string; color: string }> = {
-  "Новичок": { label: "Новичок", color: "bg-green-100 text-green-700 border-green-200" },
-  "Средний": { label: "Средний", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  "Мишлен": { label: "Мишлен", color: "bg-purple-100 text-purple-700 border-purple-200" },
+  "Beginner": { label: "Beginner", color: "bg-green-100 text-green-700 border-green-200" },
+  "Intermediate": { label: "Intermediate", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  "Expert": { label: "Expert", color: "bg-purple-100 text-purple-700 border-purple-200" },
 };
 
 const foodTypeLabels: Record<FoodType, { label: string; color: string }> = {
-  "ПП": { label: "ПП", color: "bg-green-100 text-green-700 border-green-200" },
-  "Обычная": { label: "Обычная", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  "Жирная": { label: "Жирная", color: "bg-orange-100 text-orange-700 border-orange-200" },
+  "Healthy": { label: "Healthy", color: "bg-green-100 text-green-700 border-green-200" },
+  "Regular": { label: "Regular", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  "Comfort": { label: "Comfort", color: "bg-orange-100 text-orange-700 border-orange-200" },
 };
 
 function RecipeGenerator() {
@@ -264,13 +264,13 @@ function RecipeGenerator() {
             </span>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Привет,</p>
-            <p className="font-semibold">{user?.name || "Гость"}</p>
+            <p className="text-sm text-muted-foreground">Hello,</p>
+            <p className="font-semibold">{user?.name || "Guest"}</p>
           </div>
         </header>
 
         <h1 className="text-2xl md:text-3xl font-bold mb-6" data-testid="text-generator-title">
-          Что готовим сегодня?
+          What are we cooking today?
         </h1>
 
         <div className="relative mb-6">
@@ -285,7 +285,7 @@ function RecipeGenerator() {
         </div>
 
         <div className="mb-6">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Время готовки</p>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Cooking Time</p>
           <div className="grid grid-cols-3 gap-3">
             {cookingTimeOptions.map((time) => {
               const config = cookingTimeLabels[time];
@@ -314,7 +314,7 @@ function RecipeGenerator() {
         </div>
 
         <div className="mb-6">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Тип блюда</p>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Meal Type</p>
           <div className="grid grid-cols-2 gap-3">
             {mealTypeOptions.map((type) => {
               const config = mealTypeLabels[type];
@@ -343,7 +343,7 @@ function RecipeGenerator() {
         </div>
 
         <div className="mb-6">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Уровень готовки</p>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Skill Level</p>
           <div className="flex flex-wrap gap-2">
             {skillLevelOptions.map((level) => {
               const config = skillLevelLabels[level];
@@ -368,7 +368,7 @@ function RecipeGenerator() {
         </div>
 
         <div className="mb-8">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Стиль питания</p>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Food Style</p>
           <div className="flex flex-wrap gap-2">
             {foodTypeOptions.map((type) => {
               const config = foodTypeLabels[type];
@@ -400,12 +400,12 @@ function RecipeGenerator() {
           data-testid="button-generate"
         >
           <Sparkles className="h-5 w-5" />
-          Показать рецепты
+          Find Recipes
         </Button>
 
         {ingredients.length === 0 && (
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Добавьте продукты для поиска рецептов
+            Add ingredients to search for recipes
           </p>
         )}
       </div>
