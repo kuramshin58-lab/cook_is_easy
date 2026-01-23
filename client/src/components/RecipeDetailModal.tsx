@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, Lightbulb, Check, X, Flame } from "lucide-react";
 import type { Recipe } from "@shared/schema";
+import { isIngredientAvailable, countMatchingIngredients } from "@/lib/ingredientMatching";
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;
@@ -17,45 +18,10 @@ interface RecipeDetailModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function normalizeIngredient(name: string): string {
-  return name.toLowerCase().trim();
-}
-
-function getTokens(str: string): Set<string> {
-  return new Set(
-    str.toLowerCase()
-      .replace(/[^\w\s]/gi, '')
-      .split(/\s+/)
-      .filter(t => t.length > 1)
-  );
-}
-
-function tokensMatch(str1: string, str2: string): boolean {
-  const tokens1 = getTokens(str1);
-  const tokens2 = getTokens(str2);
-  
-  const [smaller, larger] = tokens1.size <= tokens2.size ? [tokens1, tokens2] : [tokens2, tokens1];
-  
-  const matchCount = Array.from(smaller).filter(token => larger.has(token)).length;
-  
-  return matchCount >= Math.min(smaller.size, 1) && matchCount >= smaller.size * 0.5;
-}
-
-function isIngredientAvailable(ingredientName: string, userIngredients: string[]): boolean {
-  const normalizedIngredient = normalizeIngredient(ingredientName);
-  const normalizedUserIngredients = userIngredients.map(normalizeIngredient);
-  
-  return normalizedUserIngredients.some(userIng => 
-    normalizedIngredient.includes(userIng) || 
-    userIng.includes(normalizedIngredient) ||
-    tokensMatch(ingredientName, userIng)
-  );
-}
-
 export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange }: RecipeDetailModalProps) {
   if (!recipe) return null;
 
-  const availableCount = recipe.ingredients.filter(i => isIngredientAvailable(i.name, userIngredients)).length;
+  const availableCount = countMatchingIngredients(recipe.ingredients, userIngredients);
   const totalCount = recipe.ingredients.length;
 
   return (

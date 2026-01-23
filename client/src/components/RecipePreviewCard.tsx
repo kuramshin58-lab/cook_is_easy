@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Check, ShoppingCart } from "lucide-react";
 import type { Recipe } from "@shared/schema";
+import { calculateMatchPercentage } from "@/lib/ingredientMatching";
 
 interface RecipePreviewCardProps {
   recipe: Recipe;
@@ -10,54 +11,24 @@ interface RecipePreviewCardProps {
   onClick: () => void;
 }
 
-function normalizeIngredient(name: string): string {
-  return name.toLowerCase().trim();
-}
-
-function getTokens(str: string): Set<string> {
-  return new Set(
-    str.toLowerCase()
-      .replace(/[^\w\s]/gi, '')
-      .split(/\s+/)
-      .filter(t => t.length > 1)
-  );
-}
-
-function tokensMatch(str1: string, str2: string): boolean {
-  const tokens1 = getTokens(str1);
-  const tokens2 = getTokens(str2);
-  
-  const [smaller, larger] = tokens1.size <= tokens2.size ? [tokens1, tokens2] : [tokens2, tokens1];
-  
-  const matchCount = Array.from(smaller).filter(token => larger.has(token)).length;
-  
-  return matchCount >= Math.min(smaller.size, 1) && matchCount >= smaller.size * 0.5;
-}
-
-function countMatchingIngredients(recipe: Recipe, userIngredients: string[]): number {
-  const normalizedUserIngredients = userIngredients.map(normalizeIngredient);
-  
-  return recipe.ingredients.filter(ingredient => {
-    const ingredientName = normalizeIngredient(ingredient.name);
-    return normalizedUserIngredients.some(userIng => 
-      ingredientName.includes(userIng) || 
-      userIng.includes(ingredientName) ||
-      tokensMatch(ingredient.name, userIng)
-    );
-  }).length;
-}
-
 export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: RecipePreviewCardProps) {
   const totalIngredients = recipe.ingredients.length;
   
   const backendMatchPercentage = recipe.matchPercentage;
-  const matchingCount = backendMatchPercentage !== undefined 
-    ? Math.round(totalIngredients * backendMatchPercentage / 100)
-    : countMatchingIngredients(recipe, userIngredients);
+  
+  let matchingCount: number;
+  let matchPercentage: number;
+  
+  if (backendMatchPercentage !== undefined) {
+    matchPercentage = backendMatchPercentage;
+    matchingCount = Math.round(totalIngredients * backendMatchPercentage / 100);
+  } else {
+    const calculated = calculateMatchPercentage(recipe.ingredients, userIngredients);
+    matchingCount = calculated.matchingCount;
+    matchPercentage = calculated.percentage;
+  }
+  
   const missingCount = totalIngredients - matchingCount;
-  const matchPercentage = backendMatchPercentage !== undefined 
-    ? backendMatchPercentage 
-    : Math.round((matchingCount / totalIngredients) * 100);
 
   return (
     <Card 
