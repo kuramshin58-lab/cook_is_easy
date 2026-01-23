@@ -4,6 +4,12 @@
 Web application for suggesting recipes based on ingredients you have at home. Users enter ingredients, select filters (time, meal type, skill level, food style) and get 5 unique recipes. Uses hybrid search: database-first with ChatGPT fallback. Registered users get personalized recipes based on their preferences stored in Supabase.
 
 ## Recent Changes
+- 2026-01-23: Added recipe adaptation feature (AI ingredient substitution)
+  - "Adapt recipe" button appears when user doesn't have all ingredients (match < 100%)
+  - ChatGPT analyzes missing ingredients and suggests substitutions
+  - Shows original → replacement list for all substitutions
+  - Adapted recipe updates with new ingredients and adjusted steps
+  - POST /api/recipes/adapt endpoint with Zod validation
 - 2026-01-23: Simplified recipe scoring algorithm
   - Score = pure match percentage (matched ingredients / total recipe ingredients)
   - Recipes sorted by highest match % first
