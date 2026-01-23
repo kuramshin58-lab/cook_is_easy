@@ -103,18 +103,12 @@ function calculateMatchScore(
     }
   }
   
-  const baseScore = recipeIngredients.length > 0 
+  const matchPercentage = recipeIngredients.length > 0 
     ? matchedCount / recipeIngredients.length 
     : 0;
   
-  const mainIngredientBonus = mainMatchCount > 0 ? (mainMatchCount / mainIngredients.length) * 0.5 : 0;
-  
-  const specialBoost = specialMatches > 0 ? 0.2 : 0;
-  
-  const totalScore = Math.min(1, baseScore * 0.4 + mainIngredientBonus + specialBoost);
-  
   return {
-    totalScore,
+    totalScore: matchPercentage,
     mainIngredientsMatched: mainMatchCount,
     mainIngredientsTotal: mainIngredients.length,
     hasMainIngredientMatch: mainMatchCount > 0
@@ -235,16 +229,11 @@ export async function searchRecipesInDatabase(
     })
     .filter(item => 
       item.hasMainMatch &&
-      item.score > 0.15 && 
+      item.score >= 0.20 && 
       item.totalTime <= maxTime && 
       item.matchesDifficulty
     )
-    .sort((a, b) => {
-      if (b.mainMatched !== a.mainMatched) {
-        return b.mainMatched - a.mainMatched;
-      }
-      return b.score - a.score;
-    });
+    .sort((a, b) => b.score - a.score);
   
   console.log(`Found ${scoredRecipes.length} recipes matching main ingredients`);
   if (scoredRecipes.length > 0) {
