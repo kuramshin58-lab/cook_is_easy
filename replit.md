@@ -4,6 +4,10 @@
 Web application for suggesting recipes based on ingredients you have at home. Users enter ingredients, select filters (time, meal type, skill level, food style) and get 5 unique recipes. Uses hybrid search: database-first with ChatGPT fallback. Registered users get personalized recipes based on their preferences stored in Supabase.
 
 ## Recent Changes
+- 2026-01-23: Fixed search algorithm to prioritize main ingredients over base pantry ingredients
+  - Recipes must now match at least one main search ingredient (not just base ingredients)
+  - Main ingredients get higher weight in scoring
+  - Base ingredients (salt, pepper, oil) still contribute but cannot create matches alone
 - 2026-01-23: Fixed ingredient matching consistency bug
   - Created shared utility: client/src/lib/ingredientMatching.ts
   - Both RecipePreviewCard and RecipeDetailModal now use the same matching algorithm
