@@ -4,17 +4,22 @@
 Web application for suggesting recipes based on ingredients you have at home. Users enter ingredients, select filters (time, meal type, skill level, food style) and get 5 unique recipes. Uses hybrid search: database-first with ChatGPT fallback. Registered users get personalized recipes based on their preferences stored in Supabase.
 
 ## Recent Changes
+- 2026-01-26: Implemented weighted recipe scoring algorithm
+  - Ingredient categories: key (weight=10), important (5), flavor (2), base (0)
+  - Match types: exact (1.0x), substitute (0.7x), partial (0.5x), none (0x)
+  - +10% bonus for all key ingredients matched
+  - Minimum 40% threshold, requires at least one key ingredient
+  - UI shows colored badges: green (have), yellow (substitute), red (missing)
+  - Category badges in modal: Key, Important, Flavor, Base
+  - Created shared/substitutionMap.ts with 150+ ingredient substitutions
+  - Created server/weightedScoring.ts with scoring algorithm
+  - ChatGPT now generates structured ingredients with categories
 - 2026-01-23: Added recipe adaptation feature (AI ingredient substitution)
   - "Adapt recipe" button appears when user doesn't have all ingredients (match < 100%)
   - ChatGPT analyzes missing ingredients and suggests substitutions
   - Shows original → replacement list for all substitutions
   - Adapted recipe updates with new ingredients and adjusted steps
   - POST /api/recipes/adapt endpoint with Zod validation
-- 2026-01-23: Simplified recipe scoring algorithm
-  - Score = pure match percentage (matched ingredients / total recipe ingredients)
-  - Recipes sorted by highest match % first
-  - Minimum 20% match threshold to show recipe
-  - Recipes must match at least one main search ingredient (not just base pantry ingredients)
 - 2026-01-23: Fixed ingredient matching consistency bug
   - Created shared utility: client/src/lib/ingredientMatching.ts
   - Both RecipePreviewCard and RecipeDetailModal now use the same matching algorithm

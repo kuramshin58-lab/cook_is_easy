@@ -1,5 +1,7 @@
 import { supabase } from "./supabase";
-import type { Recipe, RecipeRequest } from "@shared/schema";
+import type { Recipe, RecipeRequest, StructuredIngredient } from "@shared/schema";
+import { calculateWeightedScore, filterByScore, sortByScore, toStructuredIngredient, categorizeIngredient } from "./weightedScoring";
+import { SUBSTITUTION_MAP } from "@shared/substitutionMap";
 
 interface DbRecipe {
   id: string;
@@ -24,97 +26,6 @@ function normalizeIngredient(ingredient: string): string[] {
     .filter(word => word.length > 2);
 }
 
-const specialIngredients = [
-  'pumpkin', 'squash', 'butternut',
-  'cream', 'heavy cream',
-  'mushroom', 'mushrooms',
-  'spinach',
-  'eggplant', 'aubergine',
-  'zucchini', 'courgette'
-];
-
-interface MatchResult {
-  totalScore: number;
-  mainIngredientsMatched: number;
-  mainIngredientsTotal: number;
-  hasMainIngredientMatch: boolean;
-}
-
-function calculateMatchScore(
-  recipeIngredients: string[], 
-  mainIngredients: string[],
-  baseIngredients: string[]
-): MatchResult {
-  const mainTokens = new Set(
-    mainIngredients.flatMap(ing => normalizeIngredient(ing))
-  );
-  
-  const baseTokens = new Set(
-    baseIngredients.flatMap(ing => normalizeIngredient(ing))
-  );
-  
-  const allTokens = new Set([...Array.from(mainTokens), ...Array.from(baseTokens)]);
-  
-  const specialTokens = new Set(
-    Array.from(mainTokens).filter(token => 
-      specialIngredients.some(special => token.includes(special) || special.includes(token))
-    )
-  );
-  
-  let matchedCount = 0;
-  let mainMatchCount = 0;
-  let specialMatches = 0;
-  
-  for (const recipeIng of recipeIngredients) {
-    const recipeTokens = normalizeIngredient(recipeIng);
-    
-    const matchesMain = recipeTokens.some(token => {
-      for (const mainToken of Array.from(mainTokens)) {
-        if (token.includes(mainToken) || mainToken.includes(token)) {
-          return true;
-        }
-      }
-      return false;
-    });
-    
-    const matchesAny = matchesMain || recipeTokens.some(token => {
-      for (const baseToken of Array.from(baseTokens)) {
-        if (token.includes(baseToken) || baseToken.includes(token)) {
-          return true;
-        }
-      }
-      return false;
-    });
-    
-    if (matchesAny) {
-      matchedCount++;
-      if (matchesMain) {
-        mainMatchCount++;
-      }
-      
-      const isSpecialMatch = recipeTokens.some(token =>
-        Array.from(specialTokens).some(special => 
-          token.includes(special) || special.includes(token)
-        )
-      );
-      if (isSpecialMatch) {
-        specialMatches++;
-      }
-    }
-  }
-  
-  const matchPercentage = recipeIngredients.length > 0 
-    ? matchedCount / recipeIngredients.length 
-    : 0;
-  
-  return {
-    totalScore: matchPercentage,
-    mainIngredientsMatched: mainMatchCount,
-    mainIngredientsTotal: mainIngredients.length,
-    hasMainIngredientMatch: mainMatchCount > 0
-  };
-}
-
 function mapSkillLevelToDifficulties(skillLevel: string | undefined): string[] {
   if (!skillLevel) return [];
   switch (skillLevel) {
@@ -125,29 +36,35 @@ function mapSkillLevelToDifficulties(skillLevel: string | undefined): string[] {
   }
 }
 
-function convertDbRecipeToRecipe(dbRecipe: DbRecipe, matchScore: number, userIngredients: string[]): Recipe {
-  const userTokens = new Set(
-    userIngredients.flatMap(ing => normalizeIngredient(ing))
-  );
+function parseDbIngredient(ing: string): { name: string; amount: string } {
+  const parts = ing.match(/^([\d.,\s]+(?:g|ml|tbsp|tsp|cloves?|pieces?|bunch)?)\s*(.+)$/i);
+  if (parts && parts[2]) {
+    return { name: parts[2].trim(), amount: parts[1].trim() };
+  }
+  return { name: ing, amount: "" };
+}
+
+interface ScoredDbRecipe {
+  dbRecipe: DbRecipe;
+  scoreResult: ReturnType<typeof calculateWeightedScore>;
+  structuredIngredients: StructuredIngredient[];
+  totalTime: number;
+}
+
+function buildRecipeFromScored(
+  dbRecipe: DbRecipe,
+  scoreResult: ReturnType<typeof calculateWeightedScore>,
+  structuredIngredients: StructuredIngredient[]
+): Recipe {
+  // Update ingredients with match info from scoreResult
+  const ingredientsWithMatches = scoreResult.matches.map(m => ({
+    ...m.ingredient,
+    available: m.matchType !== 'none',
+    matchType: m.matchType,
+    matchedWith: m.matchedWith
+  }));
   
-  const ingredients = dbRecipe.ingredients.map(ing => {
-    const ingTokens = normalizeIngredient(ing);
-    const isAvailable = ingTokens.some(token => {
-      for (const userToken of Array.from(userTokens)) {
-        if (token.includes(userToken) || userToken.includes(token)) {
-          return true;
-        }
-      }
-      return false;
-    });
-    
-    const parts = ing.match(/^([\d.,\s]+(?:g|ml|tbsp|tsp|cloves?|pieces?|bunch)?)\s*(.+)$/i);
-    if (parts && parts[2]) {
-      return { name: parts[2].trim(), amount: parts[1].trim(), available: isAvailable };
-    }
-    return { name: ing, amount: "", available: isAvailable };
-  });
-  
+  // Parse steps
   let steps = dbRecipe.instructions
     .split(/(?:\d+\.\s+)/)
     .filter(step => step.trim().length > 0)
@@ -169,12 +86,20 @@ function convertDbRecipeToRecipe(dbRecipe: DbRecipe, matchScore: number, userIng
     protein: Math.round(dbRecipe.calories * 0.15 / 4),
     fats: Math.round(dbRecipe.calories * 0.30 / 9),
     carbs: Math.round(dbRecipe.calories * 0.55 / 4),
-    ingredients,
+    ingredients: ingredientsWithMatches,
     steps: steps.length > 0 ? steps : [dbRecipe.instructions],
-    tips: `Recipe from database. Ingredient match: ${Math.round(matchScore * 100)}%`,
-    matchPercentage: Math.round(matchScore * 100),
-    isFromDatabase: true
+    tips: `Recipe from database. Match: ${scoreResult.score}% (${scoreResult.matchDetails.exactMatches} exact, ${scoreResult.matchDetails.substituteMatches} substitute)`,
+    matchPercentage: scoreResult.score,
+    isFromDatabase: true,
+    matchDetails: scoreResult.matchDetails
   };
+}
+
+interface ScoredRecipe {
+  recipe: Recipe;
+  score: number;
+  missingCount: number;
+  matches: ReturnType<typeof calculateWeightedScore>['matches'];
 }
 
 export async function searchRecipesInDatabase(
@@ -204,47 +129,63 @@ export async function searchRecipesInDatabase(
   
   const mainIngredients = ingredients;
   const baseIngredients = request.userPreferences?.baseIngredients || [];
-  const allIngredients = [...mainIngredients, ...baseIngredients];
   
-  console.log('=== SEARCH DEBUG ===');
+  console.log('=== WEIGHTED SEARCH DEBUG ===');
   console.log('Main ingredients (search):', mainIngredients);
   console.log('Base ingredients (profile):', baseIngredients);
   console.log('Max time:', maxTime, 'Difficulty:', allowedDifficulties);
   
-  const scoredRecipes = recipes
-    .map((recipe: DbRecipe) => {
-      const matchResult = calculateMatchScore(recipe.ingredients, mainIngredients, baseIngredients);
-      const totalTime = recipe.prep_time + recipe.cook_time;
+  // Score all recipes with weighted algorithm (single calculation)
+  const scoredRecipes: ScoredRecipe[] = recipes
+    .map((dbRecipe: DbRecipe) => {
+      const totalTime = dbRecipe.prep_time + dbRecipe.cook_time;
       const matchesDifficulty = allowedDifficulties.length === 0 || 
-        allowedDifficulties.some(d => recipe.difficulty.toLowerCase().includes(d.toLowerCase()));
+        allowedDifficulties.some(d => dbRecipe.difficulty.toLowerCase().includes(d.toLowerCase()));
       
-      return { 
-        recipe, 
-        score: matchResult.totalScore, 
-        hasMainMatch: matchResult.hasMainIngredientMatch,
-        mainMatched: matchResult.mainIngredientsMatched,
-        totalTime, 
-        matchesDifficulty 
+      // Skip if doesn't match time/difficulty filters
+      if (totalTime > maxTime || !matchesDifficulty) {
+        return null;
+      }
+      
+      // Convert db ingredients to structured ingredients (once)
+      const structuredIngredients: StructuredIngredient[] = dbRecipe.ingredients.map(ing => {
+        const { name, amount } = parseDbIngredient(ing);
+        const category = categorizeIngredient(name);
+        const normalizedName = name.toLowerCase().trim();
+        const substitutes = SUBSTITUTION_MAP[normalizedName] || [];
+        
+        return { name, amount, category, substitutes };
+      });
+      
+      // Calculate weighted score (single calculation)
+      const scoreResult = calculateWeightedScore(structuredIngredients, mainIngredients, baseIngredients);
+      
+      // Build complete recipe with score info
+      const recipe = buildRecipeFromScored(dbRecipe, scoreResult, structuredIngredients);
+      
+      return {
+        recipe,
+        score: scoreResult.score,
+        missingCount: scoreResult.missingCount,
+        matches: scoreResult.matches
       };
     })
-    .filter(item => 
-      item.hasMainMatch &&
-      item.score >= 0.20 && 
-      item.totalTime <= maxTime && 
-      item.matchesDifficulty
-    )
-    .sort((a, b) => b.score - a.score);
+    .filter((item): item is ScoredRecipe => item !== null);
   
-  console.log(`Found ${scoredRecipes.length} recipes matching main ingredients`);
-  if (scoredRecipes.length > 0) {
-    console.log('Top 3:', scoredRecipes.slice(0, 3).map(r => 
-      `${r.recipe.title} (main=${r.mainMatched}, score=${r.score.toFixed(2)})`
+  // Filter by score threshold and key ingredient requirement
+  const filteredRecipes = filterByScore(scoredRecipes);
+  
+  // Sort by score and missing count
+  const sortedRecipes = sortByScore(filteredRecipes);
+  
+  console.log(`Found ${sortedRecipes.length} recipes after weighted filtering`);
+  if (sortedRecipes.length > 0) {
+    console.log('Top 3:', sortedRecipes.slice(0, 3).map(r => 
+      `${r.recipe.title} (score=${r.score}%, missing=${r.missingCount})`
     ));
   }
   
-  const topRecipes = scoredRecipes
-    .slice(0, minResults)
-    .map(item => convertDbRecipeToRecipe(item.recipe, item.score, allIngredients));
+  const topRecipes = sortedRecipes.slice(0, minResults).map(item => item.recipe);
   
   return {
     recipes: topRecipes,

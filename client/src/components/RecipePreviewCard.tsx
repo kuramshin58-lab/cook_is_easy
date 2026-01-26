@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Check, ShoppingCart } from "lucide-react";
+import { Clock, Check, RefreshCw, ShoppingCart } from "lucide-react";
 import type { Recipe } from "@shared/schema";
-import { calculateMatchPercentage } from "@/lib/ingredientMatching";
+import { countMatchTypes, calculateMatchPercentage } from "@/lib/ingredientMatching";
 
 interface RecipePreviewCardProps {
   recipe: Recipe;
@@ -12,23 +12,30 @@ interface RecipePreviewCardProps {
 }
 
 export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: RecipePreviewCardProps) {
-  const totalIngredients = recipe.ingredients.length;
+  // Check if recipe has server-provided match info
+  const hasMatchInfo = recipe.ingredients.some(ing => ing.matchType !== undefined);
   
-  const backendMatchPercentage = recipe.matchPercentage;
-  
-  let matchingCount: number;
   let matchPercentage: number;
+  let matchCounts: { exact: number; substitute: number; missing: number; total: number };
   
-  if (backendMatchPercentage !== undefined) {
-    matchPercentage = backendMatchPercentage;
-    matchingCount = Math.round(totalIngredients * backendMatchPercentage / 100);
+  if (hasMatchInfo) {
+    // Use server-provided data
+    matchPercentage = recipe.matchPercentage ?? 0;
+    matchCounts = countMatchTypes(recipe.ingredients);
   } else {
+    // Fallback: compute client-side for AI-generated recipes
     const calculated = calculateMatchPercentage(recipe.ingredients, userIngredients);
-    matchingCount = calculated.matchingCount;
     matchPercentage = calculated.percentage;
+    matchCounts = {
+      exact: calculated.matchingCount,
+      substitute: 0,
+      missing: calculated.totalCount - calculated.matchingCount,
+      total: calculated.totalCount
+    };
   }
   
-  const missingCount = totalIngredients - matchingCount;
+  const hasSubstitutes = matchCounts.substitute > 0;
+  const hasMissing = matchCounts.missing > 0;
 
   return (
     <Card 
@@ -52,22 +59,44 @@ export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: R
           {recipe.shortDescription}
         </p>
         
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-full text-xs font-medium" data-testid={`text-matching-count-${index}`}>
-            <Check className="h-3 w-3" />
-            <span>{matchingCount}/{totalIngredients}</span>
-          </div>
-          
-          {missingCount > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground text-xs" data-testid={`text-missing-count-${index}`}>
-              <ShoppingCart className="h-3 w-3" />
-              <span>+{missingCount}</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Exact matches */}
+          {matchCounts.exact > 0 && (
+            <div 
+              className="flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2.5 py-1 rounded-full text-xs font-medium" 
+              data-testid={`badge-exact-matches-${index}`}
+            >
+              <Check className="h-3 w-3" />
+              <span>{matchCounts.exact}</span>
             </div>
           )}
           
+          {/* Substitute matches */}
+          {hasSubstitutes && (
+            <div 
+              className="flex items-center gap-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2.5 py-1 rounded-full text-xs font-medium"
+              data-testid={`badge-substitute-matches-${index}`}
+            >
+              <RefreshCw className="h-3 w-3" />
+              <span>{matchCounts.substitute}</span>
+            </div>
+          )}
+          
+          {/* Missing ingredients */}
+          {hasMissing && (
+            <div 
+              className="flex items-center gap-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2.5 py-1 rounded-full text-xs font-medium"
+              data-testid={`badge-missing-count-${index}`}
+            >
+              <ShoppingCart className="h-3 w-3" />
+              <span>+{matchCounts.missing}</span>
+            </div>
+          )}
+          
+          {/* Match percentage */}
           <div className="ml-auto text-xs font-medium" data-testid={`text-match-percentage-${index}`}>
-            <span className={matchPercentage >= 70 ? "text-primary" : "text-muted-foreground"}>
-              {matchPercentage}% match
+            <span className={matchPercentage >= 70 ? "text-primary" : matchPercentage >= 50 ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}>
+              {matchPercentage}%
             </span>
           </div>
         </div>

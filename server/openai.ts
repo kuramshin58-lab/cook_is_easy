@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { z } from "zod";
-import { recipeResponseSchema, recipeSchema, ingredientSchema, type RecipeRequest, type Recipe } from "@shared/schema";
+import { recipeResponseSchema, structuredIngredientSchema, type RecipeRequest, type Recipe } from "@shared/schema";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -18,7 +18,7 @@ const adaptedRecipeResponseSchema = z.object({
   protein: z.number().optional().default(0),
   fats: z.number().optional().default(0),
   carbs: z.number().optional().default(0),
-  ingredients: z.array(ingredientSchema),
+  ingredients: z.array(structuredIngredientSchema),
   steps: z.array(z.string()),
   tips: z.string().optional(),
   substitutions: z.array(substitutionSchema).default([])
@@ -53,7 +53,12 @@ Respond ONLY in this JSON format:
   "fats": ${recipe.fats || 10},
   "carbs": ${recipe.carbs || 30},
   "ingredients": [
-    {"name": "Ingredient name", "amount": "quantity"}
+    {
+      "name": "Ingredient name",
+      "amount": "quantity",
+      "category": "key|important|flavor|base",
+      "substitutes": ["Alternative 1", "Alternative 2"]
+    }
   ],
   "steps": ["Step 1", "Step 2"],
   "tips": "Any tips for this adapted version",
@@ -61,6 +66,12 @@ Respond ONLY in this JSON format:
     {"original": "Original ingredient", "replacement": "What it was replaced with"}
   ]
 }
+
+Ingredient categories:
+- "key": Main protein or dish base
+- "important": Significant additions (cheese, eggs, vegetables, sauces)
+- "flavor": Spices, herbs, aromatics
+- "base": Basic pantry staples (salt, pepper, oil)
 
 Rules:
 - Only include substitutions for ingredients that were actually changed
@@ -170,13 +181,24 @@ Response must be in JSON format:
       "fats": 15,
       "carbs": 30,
       "ingredients": [
-        {"name": "Ingredient name", "amount": "quantity (e.g., 200g or 2 pcs)"}
+        {
+          "name": "Ingredient name",
+          "amount": "quantity (e.g., 200g or 2 pcs)",
+          "category": "key|important|flavor|base",
+          "substitutes": ["Alternative 1", "Alternative 2"]
+        }
       ],
       "steps": ["Step 1", "Step 2", "Step 3"],
       "tips": "Helpful cooking tip (optional)"
     }
   ]
 }
+
+Ingredient categories (choose the most appropriate):
+- "key": Main protein or dish base (chicken, beef, pasta, rice, fish, tofu)
+- "important": Significant additions (cheese, eggs, vegetables, sauces, bacon)
+- "flavor": Spices, herbs, aromatics (garlic, ginger, basil, cumin, lemon)
+- "base": Basic pantry staples (salt, pepper, oil, sugar, water, flour)
 
 Quality rules (very important):
 

@@ -123,6 +123,15 @@ export const recipeRequestSchema = z.object({
 
 export type RecipeRequest = z.infer<typeof recipeRequestSchema>;
 
+// Ingredient categories for weighted scoring
+export const ingredientCategoryOptions = ["key", "important", "flavor", "base"] as const;
+export type IngredientCategory = typeof ingredientCategoryOptions[number];
+
+// Match types for scoring
+export const matchTypeOptions = ["exact", "substitute", "partial", "none"] as const;
+export type MatchType = typeof matchTypeOptions[number];
+
+// Legacy simple ingredient schema (for backward compatibility)
 export const ingredientSchema = z.object({
   name: z.string(),
   amount: z.string(),
@@ -131,12 +140,46 @@ export const ingredientSchema = z.object({
 
 export type Ingredient = z.infer<typeof ingredientSchema>;
 
+// New structured ingredient with category and substitutes
+export const structuredIngredientSchema = z.object({
+  name: z.string(),
+  amount: z.string(),
+  category: z.enum(ingredientCategoryOptions).default("important"),
+  substitutes: z.array(z.string()).default([]),
+  available: z.boolean().optional(),
+  matchType: z.enum(matchTypeOptions).optional(),
+  matchedWith: z.string().nullable().optional()
+});
+
+export type StructuredIngredient = z.infer<typeof structuredIngredientSchema>;
+
+// Match result for detailed ingredient matching info
+export const matchResultSchema = z.object({
+  ingredient: structuredIngredientSchema,
+  matchType: z.enum(matchTypeOptions),
+  matchedWith: z.string().nullable()
+});
+
+export type MatchResult = z.infer<typeof matchResultSchema>;
+
+// Match details for API response
+export const matchDetailsSchema = z.object({
+  exactMatches: z.number(),
+  substituteMatches: z.number(),
+  missingIngredients: z.array(z.object({
+    name: z.string(),
+    possibleSubstitutes: z.array(z.string())
+  }))
+});
+
+export type MatchDetails = z.infer<typeof matchDetailsSchema>;
+
 export const recipeSchema = z.object({
   title: z.string(),
   shortDescription: z.string(),
   description: z.string(),
   cookingTime: z.string(),
-  ingredients: z.array(ingredientSchema),
+  ingredients: z.array(structuredIngredientSchema),
   steps: z.array(z.string()),
   tips: z.string().optional(),
   calories: z.number().optional(),
@@ -144,7 +187,8 @@ export const recipeSchema = z.object({
   fats: z.number().optional(),
   carbs: z.number().optional(),
   matchPercentage: z.number().optional(),
-  isFromDatabase: z.boolean().optional()
+  isFromDatabase: z.boolean().optional(),
+  matchDetails: matchDetailsSchema.optional()
 });
 
 export type Recipe = z.infer<typeof recipeSchema>;

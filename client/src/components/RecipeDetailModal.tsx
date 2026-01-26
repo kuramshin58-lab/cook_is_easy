@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Clock, Lightbulb, Check, X, Flame, Wand2, ArrowRight, Loader2 } from "lucide-react";
-import type { Recipe } from "@shared/schema";
-import { isIngredientAvailable, countMatchingIngredients } from "@/lib/ingredientMatching";
+import { Clock, Lightbulb, Check, X, RefreshCw, Flame, Wand2, ArrowRight, Loader2, ShoppingCart, Minus } from "lucide-react";
+import type { Recipe, StructuredIngredient, MatchType } from "@shared/schema";
+import { getMatchTypeDisplay, getCategoryDisplay, countMatchTypes, isIngredientAvailable, calculateMatchPercentage } from "@/lib/ingredientMatching";
 import { apiRequest } from "@/lib/queryClient";
 
 interface Substitution {
@@ -38,10 +38,30 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
   if (!recipe) return null;
 
   const displayRecipe = adaptedRecipe || recipe;
-  const availableCount = countMatchingIngredients(displayRecipe.ingredients, userIngredients);
-  const totalCount = displayRecipe.ingredients.length;
-  const matchPercent = totalCount > 0 ? Math.round((availableCount / totalCount) * 100) : 0;
-  const showAdaptButton = !adaptedRecipe && matchPercent < 100;
+  
+  // For AI-generated recipes that may not have matchType info, compute client-side
+  const hasMatchInfo = displayRecipe.ingredients.some(ing => ing.matchType !== undefined);
+  
+  let matchPercentage: number;
+  let matchCounts: ReturnType<typeof countMatchTypes>;
+  
+  if (hasMatchInfo) {
+    // Use server-provided match info
+    matchPercentage = displayRecipe.matchPercentage ?? 0;
+    matchCounts = countMatchTypes(displayRecipe.ingredients);
+  } else {
+    // Fallback: compute client-side for AI-generated recipes
+    const calculated = calculateMatchPercentage(displayRecipe.ingredients, userIngredients);
+    matchPercentage = calculated.percentage;
+    matchCounts = {
+      exact: calculated.matchingCount,
+      substitute: 0,
+      missing: calculated.totalCount - calculated.matchingCount,
+      total: calculated.totalCount
+    };
+  }
+  
+  const showAdaptButton = !adaptedRecipe && matchPercentage < 100;
 
   const handleAdapt = async () => {
     setIsAdapting(true);
@@ -84,13 +104,34 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
                     <Badge variant="secondary" className="ml-2 text-xs">Adapted</Badge>
                   )}
                 </DialogTitle>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="secondary" className="gap-1" data-testid="badge-modal-time">
                     <Clock className="h-3 w-3" />
                     {displayRecipe.cookingTime}
                   </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {availableCount}/{totalCount} ingredients
+                  
+                  {/* Match summary badges */}
+                  {matchCounts.exact > 0 && (
+                    <Badge className="gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
+                      <Check className="h-3 w-3" />
+                      {matchCounts.exact}
+                    </Badge>
+                  )}
+                  {matchCounts.substitute > 0 && (
+                    <Badge className="gap-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-0">
+                      <RefreshCw className="h-3 w-3" />
+                      {matchCounts.substitute}
+                    </Badge>
+                  )}
+                  {matchCounts.missing > 0 && (
+                    <Badge className="gap-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-0">
+                      <ShoppingCart className="h-3 w-3" />
+                      +{matchCounts.missing}
+                    </Badge>
+                  )}
+                  
+                  <span className={`text-sm font-medium ${matchPercentage >= 70 ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {matchPercentage}%
                   </span>
                 </div>
               </div>
@@ -204,26 +245,64 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
               <h4 className="font-semibold mb-3">Ingredients</h4>
               <div className="space-y-2">
                 {displayRecipe.ingredients.map((ingredient, i) => {
-                  const hasIngredient = isIngredientAvailable(ingredient.name, userIngredients);
+                  // Determine match type: use server-provided or compute client-side
+                  const effectiveMatchType: MatchType = ingredient.matchType ?? 
+                    (isIngredientAvailable(ingredient.name, userIngredients) ? 'exact' : 'none');
+                  
+                  const matchDisplay = getMatchTypeDisplay(effectiveMatchType);
+                  const categoryDisplay = getCategoryDisplay(ingredient.category);
+                  const isBase = ingredient.category === 'base';
+                  
+                  // Render icon based on match type
+                  const renderIcon = () => {
+                    switch (effectiveMatchType) {
+                      case 'exact':
+                        return <Check className={`h-3.5 w-3.5 ${matchDisplay.color}`} />;
+                      case 'substitute':
+                        return <RefreshCw className={`h-3.5 w-3.5 ${matchDisplay.color}`} />;
+                      case 'partial':
+                        return <Minus className={`h-3.5 w-3.5 ${matchDisplay.color}`} />;
+                      case 'none':
+                      default:
+                        return <X className={`h-3.5 w-3.5 ${matchDisplay.color}`} />;
+                    }
+                  };
+                  
                   return (
                     <div 
                       key={i} 
-                      className={`flex items-center gap-3 p-3 rounded-lg ${
-                        hasIngredient ? 'bg-primary/5 border border-primary/20' : 'bg-muted/50'
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-lg ${matchDisplay.bgColor}`}
                       data-testid={`ingredient-${i}`}
                     >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        hasIngredient ? 'bg-primary/20' : 'bg-muted'
-                      }`}>
-                        {hasIngredient ? (
-                          <Check className="h-3.5 w-3.5 text-primary" />
-                        ) : (
-                          <X className="h-3.5 w-3.5 text-muted-foreground" />
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${matchDisplay.bgColor}`}>
+                        {renderIcon()}
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm ${effectiveMatchType === 'none' ? 'text-muted-foreground' : ''}`}>
+                            {ingredient.name}
+                          </span>
+                          {!isBase && categoryDisplay.label && (
+                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${categoryDisplay.badge}`}>
+                              {categoryDisplay.label}
+                            </Badge>
+                          )}
+                        </div>
+                        {effectiveMatchType === 'substitute' && ingredient.matchedWith && (
+                          <div className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 mt-0.5">
+                            <ArrowRight className="h-2.5 w-2.5" />
+                            <span>Using: {ingredient.matchedWith}</span>
+                          </div>
+                        )}
+                        {effectiveMatchType === 'none' && ingredient.substitutes && ingredient.substitutes.length > 0 && (
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            Try: {ingredient.substitutes.slice(0, 2).join(', ')}
+                          </div>
                         )}
                       </div>
-                      <span className="flex-1 text-sm">{ingredient.name}</span>
-                      <span className="text-muted-foreground text-sm">{ingredient.amount}</span>
+                      
+                      <span className="text-muted-foreground text-sm shrink-0">{ingredient.amount}</span>
                     </div>
                   );
                 })}
