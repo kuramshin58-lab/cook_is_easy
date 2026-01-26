@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema, recipeSchema } from "@shared/schema";
+import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema, recipeSchema, type MatchResult } from "@shared/schema";
 import { generateRecipes, adaptRecipe } from "./openai";
 import { searchRecipesInDatabase } from "./recipeSearch";
+import { calculateWeightedScore } from "./weightedScoring";
 import { supabase } from "./supabase";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -177,7 +178,36 @@ export async function registerRoutes(
       
       console.log("2. Not enough recipes in database, requesting ChatGPT...");
       
-      const aiRecipes = await generateRecipes(request);
+      const rawAiRecipes = await generateRecipes(request);
+      
+      // Apply weighted scoring to AI recipes too
+      const mainIngredients = request.ingredients;
+      const baseIngredients = request.userPreferences?.baseIngredients || [];
+      
+      const aiRecipes = rawAiRecipes.map(recipe => {
+        // Calculate weighted score for AI-generated recipe
+        const scoreResult = calculateWeightedScore(
+          recipe.ingredients,
+          mainIngredients,
+          baseIngredients
+        );
+        
+        // Update ingredients with match info
+        const ingredientsWithMatches = scoreResult.matches.map((m: MatchResult) => ({
+          ...m.ingredient,
+          available: m.matchType !== 'none',
+          matchType: m.matchType,
+          matchedWith: m.matchedWith
+        }));
+        
+        return {
+          ...recipe,
+          ingredients: ingredientsWithMatches,
+          matchPercentage: scoreResult.score,
+          matchDetails: scoreResult.matchDetails,
+          isFromDatabase: false
+        };
+      });
       
       const allRecipes = [...dbRecipes, ...aiRecipes].slice(0, 5);
       
