@@ -1,0 +1,431 @@
+# Задача: Переделать алгоритм подбора рецептов
+
+## Контекст проекта
+
+У меня есть сервис подбора рецептов "Cook is Easy". Пользователь вводит ингредиенты из холодильника, и система показывает рецепты, которые можно приготовить.
+
+**Текущая проблема:** Алгоритм расчёта совпадения слишком простой и не учитывает важность ингредиентов. Сейчас формула:
+
+```
+score = matchedIngredients / totalIngredients
+```
+
+Это плохо работает, потому что:
+- Все ингредиенты считаются равными (соль = курица)
+- Не учитываются возможные замены (сметана ↔ йогурт)
+- Базовые ингредиенты (соль, перец, масло) раздувают или занижают score
+
+---
+
+## Что нужно сделать: Внедрить взвешенный алгоритм
+
+### 1. Изменить структуру ингредиентов в базе данных
+
+Каждый ингредиент в рецепте теперь должен иметь категорию и список возможных замен.
+
+**Старая структура:**
+```json
+{
+  "ingredients": [
+    { "name": "chicken breast", "amount": "500g" },
+    { "name": "rice", "amount": "200g" },
+    { "name": "salt", "amount": "to taste" }
+  ]
+}
+```
+
+**Новая структура:**
+```json
+{
+  "ingredients": [
+    { 
+      "name": "chicken breast", 
+      "amount": "500g",
+      "category": "key",
+      "substitutes": ["turkey breast", "pork tenderloin", "tofu"]
+    },
+    { 
+      "name": "rice", 
+      "amount": "200g",
+      "category": "key",
+      "substitutes": ["quinoa", "bulgur", "couscous"]
+    },
+    { 
+      "name": "soy sauce", 
+      "amount": "2 tbsp",
+      "category": "important",
+      "substitutes": ["tamari", "coconut aminos", "worcestershire sauce"]
+    },
+    { 
+      "name": "garlic", 
+      "amount": "3 cloves",
+      "category": "flavor",
+      "substitutes": ["garlic powder", "shallots"]
+    },
+    { 
+      "name": "salt", 
+      "amount": "to taste",
+      "category": "base",
+      "substitutes": []
+    }
+  ]
+}
+```
+
+### 2. Категории ингредиентов и их веса
+
+Создай константу с весами категорий:
+
+```typescript
+const INGREDIENT_WEIGHTS = {
+  key: 10,       // Ключевые: основной белок, база блюда (курица, паста, рис)
+  important: 5,  // Важные: овощи, соусы, сыры, значимые добавки
+  flavor: 2,     // Вкусовые: специи, травы, приправы (кроме базовых)
+  base: 0        // Базовые: соль, перец, масло, вода — НЕ УЧИТЫВАЕМ в расчёте
+};
+```
+
+### 3. Типы совпадений и их множители
+
+```typescript
+const MATCH_MULTIPLIERS = {
+  exact: 1.0,      // Точное совпадение: "chicken" = "chicken"
+  substitute: 0.7, // Замена: сметана → йогурт (из списка substitutes)
+  partial: 0.5,    // Частичное: пармезан → любой твёрдый сыр (общая категория)
+  none: 0          // Нет совпадения
+};
+```
+
+### 4. Новая функция расчёта Score
+
+Замени текущую функцию расчёта score на эту логику:
+
+```typescript
+interface Ingredient {
+  name: string;
+  amount: string;
+  category: 'key' | 'important' | 'flavor' | 'base';
+  substitutes: string[];
+}
+
+interface MatchResult {
+  ingredient: Ingredient;
+  matchType: 'exact' | 'substitute' | 'partial' | 'none';
+  matchedWith: string | null; // Чем заменили (если substitute/partial)
+}
+
+function calculateWeightedScore(
+  recipeIngredients: Ingredient[],
+  userIngredients: string[],
+  userBaseIngredients: string[] // Базовые ингредиенты из профиля пользователя
+): { score: number; matches: MatchResult[]; missingCount: number } {
+  
+  const weights = { key: 10, important: 5, flavor: 2, base: 0 };
+  const multipliers = { exact: 1.0, substitute: 0.7, partial: 0.5, none: 0 };
+  
+  let totalWeight = 0;
+  let earnedPoints = 0;
+  let missingCount = 0;
+  const matches: MatchResult[] = [];
+  
+  // Объединяем пользовательские ингредиенты с базовыми
+  const allUserIngredients = [
+    ...userIngredients.map(i => normalizeIngredient(i)),
+    ...userBaseIngredients.map(i => normalizeIngredient(i))
+  ];
+  
+  for (const ingredient of recipeIngredients) {
+    const weight = weights[ingredient.category];
+    
+    // Базовые ингредиенты пропускаем в расчёте, но проверяем наличие
+    if (ingredient.category === 'base') {
+      matches.push({
+        ingredient,
+        matchType: 'exact', // Считаем что базовые всегда есть
+        matchedWith: null
+      });
+      continue;
+    }
+    
+    totalWeight += weight;
+    const normalizedName = normalizeIngredient(ingredient.name);
+    
+    // 1. Проверяем точное совпадение
+    if (hasExactMatch(normalizedName, allUserIngredients)) {
+      earnedPoints += weight * multipliers.exact;
+      matches.push({ ingredient, matchType: 'exact', matchedWith: null });
+    }
+    // 2. Проверяем замены из списка substitutes
+    else if (ingredient.substitutes && ingredient.substitutes.length > 0) {
+      const substituteMatch = findSubstituteMatch(ingredient.substitutes, allUserIngredients);
+      if (substituteMatch) {
+        earnedPoints += weight * multipliers.substitute;
+        matches.push({ ingredient, matchType: 'substitute', matchedWith: substituteMatch });
+      } else {
+        missingCount++;
+        matches.push({ ingredient, matchType: 'none', matchedWith: null });
+      }
+    }
+    // 3. Нет совпадения
+    else {
+      missingCount++;
+      matches.push({ ingredient, matchType: 'none', matchedWith: null });
+    }
+  }
+  
+  const score = totalWeight > 0 ? (earnedPoints / totalWeight) * 100 : 0;
+  
+  return {
+    score: Math.round(score * 10) / 10, // Округляем до 1 знака
+    matches,
+    missingCount
+  };
+}
+
+// Вспомогательные функции
+function normalizeIngredient(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-zа-яё\s]/gi, '') // Удаляем спецсимволы
+    .replace(/\s+/g, ' '); // Нормализуем пробелы
+}
+
+function hasExactMatch(ingredientName: string, userIngredients: string[]): boolean {
+  const tokens = ingredientName.split(' ');
+  
+  return userIngredients.some(userIng => {
+    const userTokens = userIng.split(' ');
+    // Проверяем что основные токены совпадают
+    return tokens.some(token => 
+      token.length > 2 && userTokens.some(ut => ut.includes(token) || token.includes(ut))
+    );
+  });
+}
+
+function findSubstituteMatch(substitutes: string[], userIngredients: string[]): string | null {
+  for (const sub of substitutes) {
+    const normalizedSub = normalizeIngredient(sub);
+    if (hasExactMatch(normalizedSub, userIngredients)) {
+      return sub;
+    }
+  }
+  return null;
+}
+```
+
+### 5. Изменить логику сортировки рецептов
+
+Сортируй рецепты по двум критериям:
+1. **Основной:** Взвешенный score (по убыванию)
+2. **Вторичный:** Количество недостающих ингредиентов (по возрастанию)
+
+```typescript
+function sortRecipes(recipes: RecipeWithScore[]): RecipeWithScore[] {
+  return recipes.sort((a, b) => {
+    // Сначала по score
+    if (Math.abs(a.score - b.score) > 5) {
+      return b.score - a.score;
+    }
+    // При близком score — по количеству недостающих
+    return a.missingCount - b.missingCount;
+  });
+}
+```
+
+### 6. Добавить бонус за полный набор ключевых ингредиентов
+
+Если у пользователя есть ВСЕ ключевые ингредиенты рецепта — добавь бонус +10% к score:
+
+```typescript
+function applyKeyIngredientsBonus(score: number, matches: MatchResult[]): number {
+  const keyIngredients = matches.filter(m => m.ingredient.category === 'key');
+  const allKeyMatched = keyIngredients.every(m => m.matchType !== 'none');
+  
+  if (allKeyMatched && keyIngredients.length > 0) {
+    return Math.min(100, score + 10); // Бонус +10%, но не больше 100%
+  }
+  return score;
+}
+```
+
+### 7. Обновить минимальный порог
+
+Измени минимальный порог с 20% на новую логику:
+
+```typescript
+const MIN_SCORE_THRESHOLD = 40; // Минимум 40% для показа рецепта
+const REQUIRE_KEY_INGREDIENT = true; // Хотя бы 1 ключевой должен быть
+
+function filterRecipes(recipes: RecipeWithScore[]): RecipeWithScore[] {
+  return recipes.filter(recipe => {
+    // Проверяем минимальный score
+    if (recipe.score < MIN_SCORE_THRESHOLD) return false;
+    
+    // Проверяем наличие хотя бы одного ключевого ингредиента
+    if (REQUIRE_KEY_INGREDIENT) {
+      const hasKeyMatch = recipe.matches.some(
+        m => m.ingredient.category === 'key' && m.matchType !== 'none'
+      );
+      if (!hasKeyMatch) return false;
+    }
+    
+    return true;
+  });
+}
+```
+
+### 8. Обновить ответ API
+
+Добавь в ответ информацию о совпадениях:
+
+```typescript
+interface RecipeResponse {
+  // ... существующие поля
+  matchPercentage: number;
+  matchDetails: {
+    exactMatches: number;      // Количество точных совпадений
+    substituteMatches: number; // Количество замен
+    missingIngredients: Array<{
+      name: string;
+      possibleSubstitutes: string[];
+    }>;
+  };
+}
+```
+
+### 9. Обновить отображение на фронтенде
+
+В карточке рецепта покажи детали совпадения:
+
+```
+✓ Курица (точное совпадение)
+✓ Рис (точное совпадение)  
+≈ Сметана → Йогурт (замена)
+✗ Лимон (нужно купить)
+```
+
+Используй иконки/цвета:
+- ✓ Зелёный — точное совпадение
+- ≈ Жёлтый/оранжевый — замена
+- ✗ Красный — отсутствует
+
+---
+
+## Миграция существующих рецептов
+
+Для существующих рецептов в базе нужно добавить категории. Создай скрипт миграции или используй AI для автоматической категоризации:
+
+```typescript
+// Примерные правила автокатегоризации
+const categoryRules = {
+  key: [
+    'chicken', 'beef', 'pork', 'fish', 'salmon', 'shrimp', 'tofu',
+    'pasta', 'rice', 'noodles', 'bread', 'potato'
+  ],
+  important: [
+    'cheese', 'cream', 'milk', 'egg', 'tomato', 'onion', 'carrot',
+    'sauce', 'broth', 'stock'
+  ],
+  flavor: [
+    'garlic', 'ginger', 'basil', 'oregano', 'thyme', 'cumin',
+    'paprika', 'chili', 'lemon', 'lime', 'vinegar', 'honey'
+  ],
+  base: [
+    'salt', 'pepper', 'oil', 'olive oil', 'vegetable oil', 
+    'butter', 'water', 'sugar'
+  ]
+};
+```
+
+---
+
+## Таблица замен (Substitution Map)
+
+Создай отдельный файл или таблицу в базе с популярными заменами:
+
+```typescript
+export const SUBSTITUTION_MAP: Record<string, string[]> = {
+  // Молочные
+  "sour cream": ["greek yogurt", "plain yogurt", "cream cheese", "cottage cheese"],
+  "heavy cream": ["coconut cream", "evaporated milk", "milk + butter"],
+  "milk": ["almond milk", "oat milk", "soy milk", "coconut milk"],
+  "butter": ["margarine", "coconut oil", "olive oil", "ghee"],
+  "parmesan": ["pecorino", "grana padano", "asiago", "aged cheddar"],
+  
+  // Белки
+  "chicken breast": ["turkey breast", "pork tenderloin", "tofu", "seitan"],
+  "ground beef": ["ground turkey", "ground pork", "plant-based meat"],
+  "bacon": ["pancetta", "turkey bacon", "smoked ham"],
+  "shrimp": ["prawns", "scallops", "firm tofu"],
+  
+  // Овощи
+  "spinach": ["kale", "swiss chard", "arugula"],
+  "zucchini": ["yellow squash", "eggplant", "cucumber"],
+  "bell pepper": ["poblano", "anaheim pepper", "banana pepper"],
+  
+  // Углеводы
+  "pasta": ["rice noodles", "zucchini noodles", "spaghetti squash"],
+  "rice": ["quinoa", "bulgur", "couscous", "cauliflower rice"],
+  "bread crumbs": ["crushed crackers", "oats", "almond flour"],
+  
+  // Соусы и приправы
+  "soy sauce": ["tamari", "coconut aminos", "worcestershire sauce"],
+  "fish sauce": ["soy sauce + lime", "worcestershire sauce"],
+  "wine": ["broth + vinegar", "grape juice + vinegar"],
+  "lemon juice": ["lime juice", "white wine vinegar", "apple cider vinegar"],
+  
+  // Специи
+  "fresh herbs": ["dried herbs (use 1/3 amount)"],
+  "garlic": ["garlic powder", "shallots", "garlic-infused oil"],
+  "ginger": ["ginger powder", "galangal"],
+};
+```
+
+---
+
+## Пример полного расчёта
+
+**Рецепт:** Chicken Stir Fry
+
+| Ингредиент | Категория | Вес | У пользователя | Тип совпадения | Очки |
+|------------|-----------|-----|----------------|----------------|------|
+| Chicken breast | key | 10 | ✓ chicken | exact (1.0) | 10 |
+| Rice | key | 10 | ✓ rice | exact (1.0) | 10 |
+| Soy sauce | important | 5 | ✗ есть tamari | substitute (0.7) | 3.5 |
+| Bell pepper | important | 5 | ✓ bell pepper | exact (1.0) | 5 |
+| Garlic | flavor | 2 | ✓ garlic | exact (1.0) | 2 |
+| Ginger | flavor | 2 | ✗ нет | none (0) | 0 |
+| Oil | base | 0 | — | (не считаем) | — |
+| Salt | base | 0 | — | (не считаем) | — |
+
+**Расчёт:**
+- Общий вес: 10 + 10 + 5 + 5 + 2 + 2 = 34
+- Набранные очки: 10 + 10 + 3.5 + 5 + 2 + 0 = 30.5
+- Score: (30.5 / 34) × 100 = 89.7%
+- Бонус за все key: +10% → **99.7%** (ограничено 100%)
+- Недостающих: 1 (ginger)
+
+---
+
+## Чек-лист изменений
+
+1. [ ] Обновить схему ингредиентов в базе (добавить category, substitutes)
+2. [ ] Создать константы INGREDIENT_WEIGHTS и MATCH_MULTIPLIERS
+3. [ ] Создать файл с SUBSTITUTION_MAP
+4. [ ] Написать функцию calculateWeightedScore
+5. [ ] Обновить функцию фильтрации (новый порог 40%)
+6. [ ] Обновить сортировку (score + missingCount)
+7. [ ] Добавить бонус за полный набор ключевых
+8. [ ] Обновить API response с matchDetails
+9. [ ] Обновить фронтенд для показа типов совпадений
+10. [ ] Мигрировать существующие рецепты (добавить категории)
+
+---
+
+## Важные замечания
+
+- При генерации рецептов через AI (GPT-4o) — добавь в промпт требование возвращать category и substitutes для каждого ингредиента
+- Сохрани обратную совместимость: если у ингредиента нет category — считай его как "important" по умолчанию
+- Логируй расчёты score для отладки первое время
+- Протестируй на edge cases: рецепт только из базовых ингредиентов, рецепт без ключевых и т.д.
