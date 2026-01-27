@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ChefHat, LogIn, LogOut, User, Sparkles, BookOpen } from "lucide-react";
+import { LogIn, LogOut, User, Sparkles, BookOpen } from "lucide-react";
 
 interface HeaderProps {
   user: { name: string; email: string } | null;
@@ -14,24 +14,28 @@ export function Header({ user, onLogout }: HeaderProps) {
   const isReadyRecipes = location === "/ready-recipes";
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <header className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50">
+      <div className="container max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          {/* Logo */}
           <button
             onClick={() => setLocation("/")}
-            className="flex items-center gap-2 hover-elevate rounded-md px-2 py-1"
+            className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
             data-testid="link-home"
           >
-            <ChefHat className="h-6 w-6 text-primary" />
-            <span className="font-semibold text-lg hidden sm:inline">Recipes</span>
+            <span className="text-2xl">🍳</span>
+            <span className="font-serif font-semibold text-xl text-foreground hidden sm:inline">
+              Cook Is Easy
+            </span>
           </button>
-          
-          <nav className="flex gap-1 bg-muted rounded-lg p-1">
+
+          {/* Navigation Tabs */}
+          <nav className="flex gap-1 bg-muted/60 rounded-full p-1">
             <button
               onClick={() => setLocation("/")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                isAiRecipes 
-                  ? "bg-background text-foreground shadow-sm" 
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                isAiRecipes
+                  ? "bg-white text-primary shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
               data-testid="tab-ai-recipes"
@@ -41,19 +45,20 @@ export function Header({ user, onLogout }: HeaderProps) {
             </button>
             <button
               onClick={() => setLocation("/ready-recipes")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                isReadyRecipes 
-                  ? "bg-background text-foreground shadow-sm" 
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                isReadyRecipes
+                  ? "bg-white text-primary shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
               data-testid="tab-ready-recipes"
             >
               <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Ready</span>
+              <span className="hidden sm:inline">Recipes</span>
             </button>
           </nav>
         </div>
 
+        {/* User Actions */}
         <div className="flex items-center gap-2">
           {user ? (
             <>
@@ -61,17 +66,21 @@ export function Header({ user, onLogout }: HeaderProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setLocation("/profile")}
-                className="gap-2"
+                className="gap-2 rounded-full hover:bg-secondary"
                 data-testid="button-profile"
               >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">{user.name}</span>
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary">
+                    {user.name?.charAt(0).toUpperCase() || "U"}
+                  </span>
+                </div>
+                <span className="hidden sm:inline font-medium">{user.name}</span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="gap-2"
+                className="gap-2 text-muted-foreground hover:text-foreground rounded-full"
                 data-testid="button-logout"
               >
                 <LogOut className="h-4 w-4" />
@@ -80,10 +89,9 @@ export function Header({ user, onLogout }: HeaderProps) {
             </>
           ) : (
             <Button
-              variant="default"
               size="sm"
               onClick={() => setLocation("/login")}
-              className="gap-2"
+              className="gap-2 rounded-full shadow-sm"
               data-testid="button-login"
             >
               <LogIn className="h-4 w-4" />

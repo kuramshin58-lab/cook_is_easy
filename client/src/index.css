@@ -1,6 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Cook Is Easy - Warm Organic Theme */
+/* Colors: Terracotta, Sage, Cream, Saffron */
 
 /* LIGHT MODE */
 :root {
@@ -14,72 +19,83 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 0 0% 99%;
+  /* Cream background */
+  --background: 30 43% 97%;
 
-  --foreground: 0 0% 15%;
+  /* Charcoal foreground */
+  --foreground: 195 8% 21%;
 
-  --border: 0 0% 90%;
+  --border: 30 20% 88%;
 
+  /* White cards */
   --card: 0 0% 100%;
 
-  --card-foreground: 0 0% 12%;
+  --card-foreground: 195 8% 21%;
 
-  --card-border: 0 0% 92%;
+  --card-border: 30 15% 90%;
 
-  --sidebar: 145 40% 96%;
+  --sidebar: 100 25% 95%;
 
-  --sidebar-foreground: 145 10% 20%;
+  --sidebar-foreground: 100 10% 25%;
 
-  --sidebar-border: 145 20% 88%;
+  --sidebar-border: 100 15% 85%;
 
-  --sidebar-primary: 145 63% 42%;
+  /* Sage green for sidebar */
+  --sidebar-primary: 100 25% 45%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 145 40% 90%;
+  --sidebar-accent: 100 30% 90%;
 
-  --sidebar-accent-foreground: 145 40% 25%;
+  --sidebar-accent-foreground: 100 30% 30%;
 
-  --sidebar-ring: 145 63% 42%;
+  --sidebar-ring: 100 25% 45%;
 
   --popover: 0 0% 100%;
 
-  --popover-foreground: 0 0% 12%;
+  --popover-foreground: 195 8% 21%;
 
-  --popover-border: 0 0% 90%;
+  --popover-border: 30 15% 88%;
 
-  --primary: 145 63% 42%;
+  /* Terracotta primary */
+  --primary: 11 60% 48%;
 
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 145 30% 94%;
+  /* Sage secondary */
+  --secondary: 100 25% 92%;
 
-  --secondary-foreground: 145 30% 25%;
+  --secondary-foreground: 100 25% 30%;
 
-  --muted: 0 0% 96%;
+  /* Cream muted */
+  --muted: 30 30% 94%;
 
-  --muted-foreground: 0 0% 45%;
+  --muted-foreground: 195 5% 45%;
 
-  --accent: 145 40% 92%;
+  /* Sage accent */
+  --accent: 100 30% 90%;
 
-  --accent-foreground: 145 40% 20%;
+  --accent-foreground: 100 30% 25%;
 
   --destructive: 0 72% 51%;
 
   --destructive-foreground: 0 0% 100%;
 
-  --input: 0 0% 85%;
-  --ring: 145 63% 42%;
-  --chart-1: 145 63% 42%;
-  --chart-2: 30 80% 55%;
-  --chart-3: 200 70% 50%;
-  --chart-4: 280 60% 55%;
-  --chart-5: 340 75% 55%;
+  --input: 30 15% 85%;
+  --ring: 11 60% 48%;
 
-  --font-sans: 'Inter', sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: .5rem; /* 8px */
+  /* Chart colors */
+  --chart-1: 11 60% 48%;  /* Terracotta */
+  --chart-2: 100 25% 45%; /* Sage */
+  --chart-3: 40 85% 56%;  /* Saffron */
+  --chart-4: 195 8% 35%;  /* Warm gray */
+  --chart-5: 11 45% 65%;  /* Light terracotta */
+
+  /* Typography */
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-mono: Menlo, Monaco, monospace;
+  --radius: 0.75rem; /* 12px - slightly more rounded */
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.03);
   --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.04);
   --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.05), 0px 1px 3px -1px hsl(0 0% 0% / 0.05);

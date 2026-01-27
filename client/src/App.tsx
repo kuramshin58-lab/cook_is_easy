@@ -12,25 +12,34 @@ import ReadyRecipes from "@/pages/ReadyRecipes";
 import Login from "@/pages/Login";
 import Onboarding from "@/pages/Onboarding";
 import Profile from "@/pages/Profile";
+import Landing from "@/pages/Landing";
 
 function AppContent() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header user={user} onLogout={logout} />
-      <main className="flex-1">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/recipes" component={Recipes} />
-          <Route path="/ready-recipes" component={ReadyRecipes} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Onboarding} />
-          <Route path="/profile" component={Profile} />
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-    </div>
+    <Switch>
+      {/* Landing page without header */}
+      <Route path="/landing" component={Landing} />
+
+      {/* Main app with header */}
+      <Route>
+        <div className="min-h-screen flex flex-col">
+          <Header user={user} onLogout={logout} />
+          <main className="flex-1">
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/recipes" component={Recipes} />
+              <Route path="/ready-recipes" component={ReadyRecipes} />
+              <Route path="/login" component={Login} />
+              <Route path="/register" component={Onboarding} />
+              <Route path="/profile" component={Profile} />
+              <Route component={NotFound} />
+            </Switch>
+          </main>
+        </div>
+      </Route>
+    </Switch>
   );
 }
 

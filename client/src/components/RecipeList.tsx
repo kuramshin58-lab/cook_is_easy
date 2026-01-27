@@ -2,20 +2,20 @@ import { useState, useEffect } from "react";
 import { RecipePreviewCard } from "./RecipePreviewCard";
 import { RecipeDetailModal } from "./RecipeDetailModal";
 import { Card, CardContent } from "@/components/ui/card";
-import { UtensilsCrossed, AlertCircle, ChefHat } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import type { Recipe } from "@shared/schema";
 
 const loadingPhrases = [
-  "Heating up the pan…",
-  "Sharpening the knives…",
-  "Getting your favorite plate…",
-  "Mixing ideas in a bowl…",
-  "Checking for spices…",
-  "Boiling the water…",
-  "Adding a pinch of magic…",
-  "Tasting the sauce…",
-  "Chopping onions (mentally)…",
-  "Putting together your recipe…",
+  "Heating up the pan...",
+  "Sharpening the knives...",
+  "Getting your favorite plate...",
+  "Mixing ideas in a bowl...",
+  "Checking for spices...",
+  "Boiling the water...",
+  "Adding a pinch of magic...",
+  "Tasting the sauce...",
+  "Chopping onions (mentally)...",
+  "Putting together your recipe...",
 ];
 
 interface RecipeListProps {
@@ -45,18 +45,18 @@ function CookingLoadingAnimation() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="loading-recipes">
       <div className="relative mb-8">
-        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-          <ChefHat className="h-12 w-12 text-primary" />
+        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center animate-pulse shadow-lg">
+          <span className="text-5xl">👨‍🍳</span>
         </div>
-        <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-md">
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
-      
+
       <h3 className="text-lg font-semibold mb-2">Preparing your recipes</h3>
-      
+
       <div className="h-8 flex items-center justify-center">
-        <p 
+        <p
           className={`text-muted-foreground transition-opacity duration-300 ${
             fadeIn ? "opacity-100" : "opacity-0"
           }`}
@@ -64,14 +64,16 @@ function CookingLoadingAnimation() {
           {loadingPhrases[phraseIndex]}
         </p>
       </div>
-      
-      <div className="flex gap-1.5 mt-6">
-        {[0, 1, 2].map((i) => (
-          <div
+
+      <div className="flex gap-2 mt-6 text-2xl">
+        {["🥕", "🧅", "🧄", "🌶️"].map((emoji, i) => (
+          <span
             key={i}
-            className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-            style={{ animationDelay: `${i * 0.15}s` }}
-          />
+            className="animate-bounce"
+            style={{ animationDelay: `${i * 0.1}s` }}
+          >
+            {emoji}
+          </span>
         ))}
       </div>
     </div>
@@ -87,10 +89,15 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
 
   if (error) {
     return (
-      <Card className="border-destructive/50" data-testid="error-message">
+      <Card className="border-destructive/30 bg-destructive/5" data-testid="error-message">
         <CardContent className="flex items-center gap-3 py-6">
-          <AlertCircle className="h-5 w-5 text-destructive" />
-          <p className="text-sm">{error}</p>
+          <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+            <AlertCircle className="h-5 w-5 text-destructive" />
+          </div>
+          <div>
+            <p className="font-medium text-sm">Error</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -99,10 +106,10 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
   if (!hasSearched) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center" data-testid="empty-state-initial">
-        <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-4">
-          <UtensilsCrossed className="h-8 w-8 text-primary" />
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-secondary/30 flex items-center justify-center mb-4 shadow-md">
+          <span className="text-4xl">🍽️</span>
         </div>
-        <h3 className="font-medium mb-1">Add ingredients</h3>
+        <h3 className="font-semibold mb-1">Add ingredients</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
           Select the ingredients you have, set your filters, and click "Find Recipes"
         </p>
@@ -113,10 +120,10 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
   if (recipes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center" data-testid="empty-state-no-results">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-          <UtensilsCrossed className="h-8 w-8 text-muted-foreground" />
+        <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
+          <span className="text-4xl">🤔</span>
         </div>
-        <h3 className="font-medium mb-1">No recipes found</h3>
+        <h3 className="font-semibold mb-1">No recipes found</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
           Try adding more ingredients or changing your filters
         </p>
@@ -127,20 +134,21 @@ export function RecipeList({ recipes, userIngredients, isLoading, error, hasSear
   return (
     <>
       <div className="space-y-4" data-testid="recipe-list">
-        <p className="text-sm text-muted-foreground">
-          Recipes found: {recipes.length}
-        </p>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="text-lg">✨</span>
+          <span>Found <strong className="text-foreground">{recipes.length}</strong> recipes for you</span>
+        </div>
         {recipes.map((recipe, index) => (
-          <RecipePreviewCard 
-            key={index} 
-            recipe={recipe} 
+          <RecipePreviewCard
+            key={index}
+            recipe={recipe}
             index={index}
             userIngredients={userIngredients}
             onClick={() => setSelectedRecipe(recipe)}
           />
         ))}
       </div>
-      
+
       <RecipeDetailModal
         recipe={selectedRecipe}
         userIngredients={userIngredients}

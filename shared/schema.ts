@@ -157,7 +157,8 @@ export type StructuredIngredient = z.infer<typeof structuredIngredientSchema>;
 export const matchResultSchema = z.object({
   ingredient: structuredIngredientSchema,
   matchType: z.enum(matchTypeOptions),
-  matchedWith: z.string().nullable()
+  matchedWith: z.string().nullable(),
+  matchSource: z.enum(["main", "base"]).nullable()
 });
 
 export type MatchResult = z.infer<typeof matchResultSchema>;

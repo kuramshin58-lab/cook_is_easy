@@ -4,6 +4,8 @@ import { Clock, Check, RefreshCw, ShoppingCart } from "lucide-react";
 import type { Recipe } from "@shared/schema";
 import { countMatchTypes, calculateMatchPercentage } from "@/lib/ingredientMatching";
 
+const recipeEmojis = ["🍝", "🥗", "🍲", "🥘", "🍜", "🍳", "🥪", "🍕", "🌮", "🍛"];
+
 interface RecipePreviewCardProps {
   recipe: Recipe;
   index: number;
@@ -12,12 +14,14 @@ interface RecipePreviewCardProps {
 }
 
 export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: RecipePreviewCardProps) {
+  const emoji = recipeEmojis[index % recipeEmojis.length];
+
   // Check if recipe has server-provided match info
   const hasMatchInfo = recipe.ingredients.some(ing => ing.matchType !== undefined);
-  
+
   let matchPercentage: number;
   let matchCounts: { exact: number; substitute: number; missing: number; total: number };
-  
+
   if (hasMatchInfo) {
     // Use server-provided data
     matchPercentage = recipe.matchPercentage ?? 0;
@@ -33,71 +37,96 @@ export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: R
       total: calculated.totalCount
     };
   }
-  
+
   const hasSubstitutes = matchCounts.substitute > 0;
   const hasMissing = matchCounts.missing > 0;
 
   return (
-    <Card 
-      className="cursor-pointer hover-elevate active-elevate-2 transition-all border-0 shadow-md overflow-hidden"
+    <Card
+      className="cursor-pointer hover:shadow-lg transition-all border-0 shadow-md overflow-hidden bg-card/80 backdrop-blur-sm group"
       onClick={onClick}
       data-testid={`card-recipe-preview-${index}`}
     >
-      <div className="h-2 bg-gradient-to-r from-primary/60 to-primary" style={{ width: `${matchPercentage}%` }} />
+      {/* Match percentage bar */}
+      <div className="h-1.5 bg-muted/50">
+        <div
+          className="h-full bg-gradient-to-r from-primary/70 to-primary transition-all"
+          style={{ width: `${matchPercentage}%` }}
+        />
+      </div>
+
       <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <h3 className="font-semibold text-base leading-tight" data-testid={`text-recipe-title-${index}`}>
-            {recipe.title}
-          </h3>
-          <Badge variant="secondary" className="shrink-0 gap-1 text-xs" data-testid={`badge-time-${index}`}>
-            <Clock className="h-3 w-3" />
-            {recipe.cookingTime}
-          </Badge>
-        </div>
-        
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2" data-testid={`text-recipe-description-${index}`}>
-          {recipe.shortDescription}
-        </p>
-        
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Exact matches */}
-          {matchCounts.exact > 0 && (
-            <div 
-              className="flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2.5 py-1 rounded-full text-xs font-medium" 
-              data-testid={`badge-exact-matches-${index}`}
-            >
-              <Check className="h-3 w-3" />
-              <span>{matchCounts.exact}</span>
+        <div className="flex items-start gap-4">
+          {/* Recipe emoji */}
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <span className="text-2xl">{emoji}</span>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <h3 className="font-semibold text-base leading-tight line-clamp-1" data-testid={`text-recipe-title-${index}`}>
+                {recipe.title}
+              </h3>
+              <Badge variant="secondary" className="shrink-0 gap-1 text-xs rounded-full px-2.5" data-testid={`badge-time-${index}`}>
+                <Clock className="h-3 w-3" />
+                {recipe.cookingTime}
+              </Badge>
             </div>
-          )}
-          
-          {/* Substitute matches */}
-          {hasSubstitutes && (
-            <div 
-              className="flex items-center gap-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2.5 py-1 rounded-full text-xs font-medium"
-              data-testid={`badge-substitute-matches-${index}`}
-            >
-              <RefreshCw className="h-3 w-3" />
-              <span>{matchCounts.substitute}</span>
+
+            <p className="text-muted-foreground text-sm mb-3 line-clamp-2" data-testid={`text-recipe-description-${index}`}>
+              {recipe.shortDescription}
+            </p>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Exact matches */}
+              {matchCounts.exact > 0 && (
+                <div
+                  className="flex items-center gap-1.5 bg-secondary/50 text-secondary-foreground px-2.5 py-1 rounded-full text-xs font-medium"
+                  data-testid={`badge-exact-matches-${index}`}
+                >
+                  <Check className="h-3 w-3" />
+                  <span>{matchCounts.exact} have</span>
+                </div>
+              )}
+
+              {/* Substitute matches */}
+              {hasSubstitutes && (
+                <div
+                  className="flex items-center gap-1.5 bg-accent/50 text-accent-foreground px-2.5 py-1 rounded-full text-xs font-medium"
+                  data-testid={`badge-substitute-matches-${index}`}
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  <span>{matchCounts.substitute} swap</span>
+                </div>
+              )}
+
+              {/* Missing ingredients */}
+              {hasMissing && (
+                <div
+                  className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-full text-xs font-medium"
+                  data-testid={`badge-missing-count-${index}`}
+                >
+                  <ShoppingCart className="h-3 w-3" />
+                  <span>+{matchCounts.missing}</span>
+                </div>
+              )}
+
+              {/* Match percentage */}
+              <div className="ml-auto flex items-center gap-1.5" data-testid={`text-match-percentage-${index}`}>
+                <span
+                  className={`text-sm font-semibold ${
+                    matchPercentage >= 70
+                      ? "text-primary"
+                      : matchPercentage >= 50
+                      ? "text-accent-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {matchPercentage}%
+                </span>
+                <span className="text-xs text-muted-foreground">match</span>
+              </div>
             </div>
-          )}
-          
-          {/* Missing ingredients */}
-          {hasMissing && (
-            <div 
-              className="flex items-center gap-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2.5 py-1 rounded-full text-xs font-medium"
-              data-testid={`badge-missing-count-${index}`}
-            >
-              <ShoppingCart className="h-3 w-3" />
-              <span>+{matchCounts.missing}</span>
-            </div>
-          )}
-          
-          {/* Match percentage */}
-          <div className="ml-auto text-xs font-medium" data-testid={`text-match-percentage-${index}`}>
-            <span className={matchPercentage >= 70 ? "text-primary" : matchPercentage >= 50 ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}>
-              {matchPercentage}%
-            </span>
           </div>
         </div>
       </CardContent>

@@ -14,6 +14,10 @@ export const MATCH_MULTIPLIERS = {
   none: 0          // No match
 } as const;
 
+// Weight multiplier for baseIngredients matches (from user profile)
+// Main ingredients get full weight (1.0), base ingredients get reduced weight
+export const BASE_INGREDIENT_WEIGHT = 0.3;
+
 // Minimum score threshold to show recipe
 export const MIN_SCORE_THRESHOLD = 40;
 
@@ -157,6 +161,10 @@ export const SUBSTITUTION_MAP: Record<string, string[]> = {
   "sriracha": ["hot sauce", "sambal oelek", "gochujang", "chili garlic sauce"],
   "tomato paste": ["tomato sauce", "ketchup", "sun-dried tomatoes"],
   "tomato sauce": ["crushed tomatoes", "tomato paste with water", "marinara"],
+  "tomato purée": ["tomato paste", "crushed tomatoes", "tomato sauce", "canned tomatoes"],
+  "tomato puree": ["tomato paste", "crushed tomatoes", "tomato sauce", "canned tomatoes"],
+  "passata": ["tomato paste", "crushed tomatoes", "tomato purée", "tomato sauce"],
+  "crushed tomatoes": ["tomato sauce", "tomato purée", "diced tomatoes", "tomato paste with water"],
   "mustard": ["dijon mustard", "honey mustard", "mustard powder"],
   "mayonnaise": ["greek yogurt", "sour cream", "aioli", "avocado"],
 

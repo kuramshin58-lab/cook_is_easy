@@ -1,10 +1,11 @@
 import type { StructuredIngredient, MatchResult, MatchDetails, MatchType, IngredientCategory } from "@shared/schema";
-import { 
-  INGREDIENT_WEIGHTS, 
-  MATCH_MULTIPLIERS, 
+import {
+  INGREDIENT_WEIGHTS,
+  MATCH_MULTIPLIERS,
   MIN_SCORE_THRESHOLD,
   REQUIRE_KEY_INGREDIENT,
   ALL_KEYS_BONUS,
+  BASE_INGREDIENT_WEIGHT,
   SUBSTITUTION_MAP,
   CATEGORY_RULES
 } from "@shared/substitutionMap";
@@ -29,20 +30,40 @@ function normalizeIngredient(name: string): string {
 function hasExactMatch(ingredientName: string, userIngredients: string[]): boolean {
   const normalizedName = normalizeIngredient(ingredientName);
   const tokens = normalizedName.split(' ').filter(t => t.length > 2);
-  
+
   return userIngredients.some(userIng => {
     const normalizedUser = normalizeIngredient(userIng);
-    const userTokens = normalizedUser.split(' ');
-    
-    // Check if ingredient name contains user ingredient or vice versa
-    if (normalizedName.includes(normalizedUser) || normalizedUser.includes(normalizedName)) {
+    const userTokens = normalizedUser.split(' ').filter(t => t.length > 2);
+
+    // Exact string match (full ingredient name)
+    if (normalizedName === normalizedUser) {
       return true;
     }
-    
-    // Check token overlap for multi-word ingredients
-    return tokens.some(token => 
-      userTokens.some(ut => ut.includes(token) || token.includes(ut))
+
+    // One ingredient fully contains the other (e.g., "olive oil" vs "extra virgin olive oil")
+    if (normalizedName.includes(normalizedUser) || normalizedUser.includes(normalizedName)) {
+      // But make sure it's not just sharing one common word like "tomato"
+      const shorterTokens = tokens.length <= userTokens.length ? tokens : userTokens;
+      const longerString = tokens.length <= userTokens.length ? normalizedUser : normalizedName;
+
+      // All tokens from shorter ingredient must be in longer ingredient
+      const allTokensPresent = shorterTokens.every(token => longerString.includes(token));
+      if (allTokensPresent) {
+        return true;
+      }
+    }
+
+    // For single-token ingredients, require exact match
+    if (tokens.length === 1 || userTokens.length === 1) {
+      return tokens.length === 1 && userTokens.length === 1 && tokens[0] === userTokens[0];
+    }
+
+    // For multi-token ingredients, require at least 2 matching tokens
+    const matchingTokens = tokens.filter(token =>
+      userTokens.some(ut => ut === token || ut.includes(token) || token.includes(ut))
     );
+
+    return matchingTokens.length >= 2;
   });
 }
 
@@ -57,14 +78,28 @@ function findSubstituteMatch(ingredientName: string, substitutes: string[], user
   
   // Also check the global substitution map
   const normalizedName = normalizeIngredient(ingredientName);
-  const globalSubs = SUBSTITUTION_MAP[normalizedName] || [];
-  
+  let globalSubs = SUBSTITUTION_MAP[normalizedName] || [];
+
+  // If no exact match, try partial matches (e.g., "tomato puree passata" → "tomato puree")
+  if (globalSubs.length === 0) {
+    const words = normalizedName.split(' ');
+
+    // Try progressively shorter versions (from right to left)
+    for (let i = words.length - 1; i >= 1; i--) {
+      const partial = words.slice(0, i).join(' ');
+      globalSubs = SUBSTITUTION_MAP[partial] || [];
+      if (globalSubs.length > 0) {
+        break;
+      }
+    }
+  }
+
   for (const sub of globalSubs) {
     if (hasExactMatch(sub, userIngredients)) {
       return sub;
     }
   }
-  
+
   return null;
 }
 
@@ -113,74 +148,123 @@ export function calculateWeightedScore(
   let substituteMatches = 0;
   const matches: MatchResult[] = [];
   const missingIngredients: { name: string; possibleSubstitutes: string[] }[] = [];
-  
-  // Combine user ingredients with base ingredients
-  const allUserIngredients = [
-    ...userIngredients.map(i => normalizeIngredient(i)),
-    ...userBaseIngredients.map(i => normalizeIngredient(i))
-  ];
-  
+
+  // Separate main and base ingredients (DO NOT combine them!)
+  const mainIngNormalized = userIngredients.map(i => normalizeIngredient(i));
+  const baseIngNormalized = userBaseIngredients.map(i => normalizeIngredient(i));
+
   for (const ingredient of recipeIngredients) {
     const weight = INGREDIENT_WEIGHTS[ingredient.category];
-    
-    // Base ingredients are always assumed to be available
+
+    // Base category ingredients are always assumed to be available
     if (ingredient.category === 'base') {
       matches.push({
         ingredient: { ...ingredient, available: true, matchType: 'exact' },
         matchType: 'exact',
-        matchedWith: null
+        matchedWith: null,
+        matchSource: null
       });
       continue;
     }
-    
+
     totalWeight += weight;
-    
-    // 1. Check for exact match
-    if (hasExactMatch(ingredient.name, allUserIngredients)) {
-      earnedPoints += weight * MATCH_MULTIPLIERS.exact;
+
+    let matched = false;
+    let matchSource: 'main' | 'base' | null = null;
+    let matchType: 'exact' | 'substitute' | 'none' = 'none';
+    let matchedWith: string | null = null;
+    let pointsEarned = 0;
+
+    // 1. Check for exact match in MAIN ingredients (priority!)
+    if (hasExactMatch(ingredient.name, mainIngNormalized)) {
+      pointsEarned = weight * MATCH_MULTIPLIERS.exact * 1.0;  // Full weight
+      matchSource = 'main';
+      matchType = 'exact';
+      matched = true;
       exactMatches++;
-      matches.push({
-        ingredient: { ...ingredient, available: true, matchType: 'exact' },
-        matchType: 'exact',
-        matchedWith: null
-      });
     }
-    // 2. Check for substitute match
+    // 2. Check for substitute match in MAIN ingredients
     else {
       const substituteMatch = findSubstituteMatch(
-        ingredient.name, 
-        ingredient.substitutes || [], 
-        allUserIngredients
+        ingredient.name,
+        ingredient.substitutes || [],
+        mainIngNormalized
       );
-      
+
       if (substituteMatch) {
-        earnedPoints += weight * MATCH_MULTIPLIERS.substitute;
+        pointsEarned = weight * MATCH_MULTIPLIERS.substitute * 1.0;  // Full weight
+        matchSource = 'main';
+        matchType = 'substitute';
+        matchedWith = substituteMatch;
+        matched = true;
         substituteMatches++;
-        matches.push({
-          ingredient: { ...ingredient, available: true, matchType: 'substitute', matchedWith: substituteMatch },
-          matchType: 'substitute',
-          matchedWith: substituteMatch
-        });
-      } else {
-        // 3. No match found
-        missingCount++;
-        const normalizedName = normalizeIngredient(ingredient.name);
-        const possibleSubs = [
-          ...(ingredient.substitutes || []),
-          ...(SUBSTITUTION_MAP[normalizedName] || [])
-        ].slice(0, 5);
-        
-        missingIngredients.push({
-          name: ingredient.name,
-          possibleSubstitutes: possibleSubs
-        });
-        
-        matches.push({
-          ingredient: { ...ingredient, available: false, matchType: 'none' },
-          matchType: 'none',
-          matchedWith: null
-        });
       }
+    }
+
+    // 3. If not found in main, check BASE ingredients (reduced weight!)
+    if (!matched) {
+      if (hasExactMatch(ingredient.name, baseIngNormalized)) {
+        pointsEarned = weight * MATCH_MULTIPLIERS.exact * BASE_INGREDIENT_WEIGHT;  // 30% weight
+        matchSource = 'base';
+        matchType = 'exact';
+        matched = true;
+        exactMatches++;
+      }
+      // 4. Check for substitute match in BASE ingredients
+      else {
+        const substituteMatch = findSubstituteMatch(
+          ingredient.name,
+          ingredient.substitutes || [],
+          baseIngNormalized
+        );
+
+        if (substituteMatch) {
+          pointsEarned = weight * MATCH_MULTIPLIERS.substitute * BASE_INGREDIENT_WEIGHT;  // 21% weight
+          matchSource = 'base';
+          matchType = 'substitute';
+          matchedWith = substituteMatch;
+          matched = true;
+          substituteMatches++;
+        }
+      }
+    }
+
+    // Add earned points
+    earnedPoints += pointsEarned;
+
+    // Build match result
+    if (matched) {
+      matches.push({
+        ingredient: {
+          ...ingredient,
+          available: true,
+          matchType,
+          matchedWith
+        },
+        matchType,
+        matchedWith,
+        matchSource
+      });
+    } else {
+      // No match found
+      missingCount++;
+      const normalizedName = normalizeIngredient(ingredient.name);
+      const possibleSubs = [
+        ...(ingredient.substitutes || []),
+        ...(SUBSTITUTION_MAP[normalizedName] || [])
+      ].slice(0, 5);
+
+      missingIngredients.push({
+        name: ingredient.name,
+        possibleSubstitutes: possibleSubs
+      });
+
+      matches.push({
+        ingredient: { ...ingredient, available: false, matchType: 'none' },
+        matchType: 'none',
+        matchedWith: null,
+        matchSource: null
+      });
     }
   }
   
@@ -212,17 +296,27 @@ export function filterByScore<T extends { score: number; matches: MatchResult[] 
   recipes: T[]
 ): T[] {
   return recipes.filter(recipe => {
-    // Check minimum score
+    // Check 1: Minimum score threshold
     if (recipe.score < MIN_SCORE_THRESHOLD) return false;
-    
-    // Check for at least one key ingredient
+
+    // Check 2: At least one key ingredient must match
     if (REQUIRE_KEY_INGREDIENT) {
       const hasKeyMatch = recipe.matches.some(
         m => m.ingredient.category === 'key' && m.matchType !== 'none'
       );
       if (!hasKeyMatch) return false;
     }
-    
+
+    // Check 3 (CRITICAL): At least one KEY or IMPORTANT ingredient must match from MAIN ingredients
+    // This prevents recipes with only base ingredients from appearing
+    const hasMainIngredientMatch = recipe.matches.some(m =>
+      (m.ingredient.category === 'key' || m.ingredient.category === 'important') &&
+      m.matchType !== 'none' &&
+      m.matchSource === 'main'
+    );
+
+    if (!hasMainIngredientMatch) return false;
+
     return true;
   });
 }
