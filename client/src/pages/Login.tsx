@@ -29,7 +29,7 @@ export default function Login() {
         title: "Welcome back!",
         description: `Good to see you again, ${data.user.name}`,
       });
-      setLocation("/");
+      setLocation("/app");
     },
     onError: (error: Error) => {
       toast({

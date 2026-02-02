@@ -25,7 +25,7 @@ export default function Recipes() {
 
   useEffect(() => {
     if (!recipeRequest) {
-      setLocation("/");
+      setLocation("/app");
       return;
     }
 

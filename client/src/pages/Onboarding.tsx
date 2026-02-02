@@ -110,7 +110,7 @@ export default function Onboarding() {
         title: "Registration successful!",
         description: "Welcome to the recipe finder",
       });
-      setLocation("/");
+      setLocation("/app");
     },
     onError: (error: Error) => {
       toast({
