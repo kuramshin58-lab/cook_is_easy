@@ -1,9 +1,56 @@
-node_modules
-dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+
+# Environment variables (NEVER commit these!)
 .env
 .env.local
-.env.*.local.mcp.json
+.env.*.local
+
+# OS files
+.DS_Store
+
+# Server
+server/public
+
+# Vite
+vite.config.ts.*
+
+# Archives
+*.tar.gz
+
+# MCP config (contains API keys)
+.mcp.json
+
+# AI tool configs (auto-generated, not needed in repo)
+.agent/
+.agents/
+.cline/
+.codebuddy/
+.codex/
+.commandcode/
+.continue/
+.crush/
+.cursor/
+.factory/
+.goose/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.opencode/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.windsurf/
+.zencoder/

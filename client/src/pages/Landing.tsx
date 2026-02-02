@@ -218,7 +218,7 @@ export default function Landing() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            onClick={() => setLocation("/app")}
+            onClick={() => setLocation("/login")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -352,7 +352,7 @@ export default function Landing() {
                       className="demo-cta"
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => setLocation("/app")}
+                      onClick={() => setLocation("/login")}
                     >
                       See Full Recipes →
                     </motion.button>
@@ -557,7 +557,7 @@ export default function Landing() {
               className="cta-button"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setLocation("/app")}
+              onClick={() => setLocation("/login")}
             >
               <span>🍳</span> Start Cooking — It's Free
             </motion.button>
@@ -587,7 +587,7 @@ export default function Landing() {
       <div className="mobile-sticky-cta">
         <motion.button
           whileTap={{ scale: 0.98 }}
-          onClick={() => setLocation("/app")}
+          onClick={() => setLocation("/login")}
         >
           🍳 Find Recipes Now — It's Free
         </motion.button>
