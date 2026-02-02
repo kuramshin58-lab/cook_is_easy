@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Check, RefreshCw, ShoppingCart } from "lucide-react";
 import type { Recipe } from "@shared/schema";
 import { countMatchTypes, calculateMatchPercentage } from "@/lib/ingredientMatching";
+import { SaveHeartButton } from "./SaveHeartButton";
 
 const recipeEmojis = ["🍝", "🥗", "🍲", "🥘", "🍜", "🍳", "🥪", "🍕", "🌮", "🍛"];
 
@@ -57,9 +58,18 @@ export function RecipePreviewCard({ recipe, index, userIngredients, onClick }: R
 
       <CardContent className="p-5">
         <div className="flex items-start gap-4">
-          {/* Recipe emoji */}
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <span className="text-2xl">{emoji}</span>
+          {/* Recipe emoji with save button */}
+          <div className="relative shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span className="text-2xl">{emoji}</span>
+            </div>
+            <SaveHeartButton
+              recipe={{ title: recipe.title }}
+              recipeData={recipe}
+              isFromDatabase={recipe.isFromDatabase ?? false}
+              size="sm"
+              className="absolute -top-1 -right-1 shadow-sm"
+            />
           </div>
 
           <div className="flex-1 min-w-0">

@@ -1,0 +1,50 @@
+# Cook Is Easy
+
+> AI-powered recipe finder that suggests delicious recipes based on ingredients you have. Free web app with smart matching and ingredient substitutions. Stop wasting food, start cooking amazing meals.
+
+Cook Is Easy solves a common problem: you open your fridge, see random ingredients, and don't know what to cook. Our app takes your available ingredients and finds matching recipes from a curated database of 189+ recipes.
+
+## Key Features
+
+- **Smart Ingredient Matching**: Enter ingredients you have, get recipes ranked by match percentage
+- **Weighted Scoring**: Key ingredients (proteins, main starches) matter more than seasonings
+- **Ingredient Substitutions**: 100+ substitution mappings - missing cream? Use coconut milk
+- **Difficulty Filters**: Easy, medium, or hard recipes based on your skill level
+- **Time Filters**: 20, 40, or 60 minute cooking time options
+- **AI Recipe Generation**: When database doesn't have matches, AI creates custom recipes
+
+## How It Works
+
+1. User enters ingredients they have (e.g., chicken, pasta, garlic)
+2. System searches 189+ recipe database
+3. Each recipe scored by weighted ingredient matching:
+   - Key ingredients (chicken, beef, pasta): 10x weight
+   - Important ingredients (vegetables, cheese): 5x weight
+   - Flavor ingredients (spices, herbs): 2x weight
+   - Base ingredients (salt, oil, water): 0 weight
+4. Results show match percentage (e.g., "95% match")
+5. Each recipe includes substitution suggestions for missing ingredients
+
+## Target Users
+
+- Home cooks tired of meal planning
+- People who want to reduce food waste
+- Busy people who need quick cooking decisions
+- Budget-conscious cooks using what they have
+
+## Links
+
+- [Landing Page](https://cookiseasy.app/landing): Marketing page with interactive demo
+- [Main App](https://cookiseasy.app/): Recipe search interface (requires signup)
+- [About](https://cookiseasy.app/about): Company mission and values
+- [Privacy Policy](https://cookiseasy.app/privacy): How we handle your data
+- [Terms of Service](https://cookiseasy.app/terms): Usage terms and conditions
+- [Contact](https://cookiseasy.app/contact): Get in touch with us
+
+## Stats
+
+- 189+ curated recipes
+- 2000+ ingredient mappings
+- 100+ substitution rules
+- Supports breakfast, lunch, dinner, snacks, salads
+- Easy, medium, hard difficulty levels

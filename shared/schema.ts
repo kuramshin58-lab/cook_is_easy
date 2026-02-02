@@ -546,3 +546,31 @@ export interface ReadyRecipe {
 }
 
 export const readyRecipes: ReadyRecipe[] = [];
+
+// Saved recipes schema
+export const saveRecipeRequestSchema = z.object({
+  userId: z.string().uuid(),
+  recipeId: z.string().uuid().optional(),
+  recipeTitle: z.string().min(1),
+  recipeData: recipeSchema.optional(),
+  isFromDatabase: z.boolean().default(true)
+});
+
+export type SaveRecipeRequest = z.infer<typeof saveRecipeRequestSchema>;
+
+export const unsaveRecipeRequestSchema = z.object({
+  userId: z.string().uuid(),
+  recipeTitle: z.string().min(1)
+});
+
+export type UnsaveRecipeRequest = z.infer<typeof unsaveRecipeRequestSchema>;
+
+export interface SavedRecipeRow {
+  id: string;
+  user_id: string;
+  recipe_id: string | null;
+  recipe_title: string;
+  recipe_data: Recipe | null;
+  is_from_database: boolean;
+  saved_at: string;
+}

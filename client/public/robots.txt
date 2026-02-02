@@ -1,0 +1,36 @@
+# Cook Is Easy - Robots.txt
+User-agent: *
+Allow: /
+Allow: /landing
+Allow: /recipes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
+# Allow AI crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemaps
+Sitemap: https://cookiseasy.app/sitemap.xml
+
+# LLM Context
+# See /llms.txt for AI-friendly content summary

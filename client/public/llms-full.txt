@@ -1,0 +1,148 @@
+# Cook Is Easy - Full Documentation for AI Systems
+
+> Comprehensive guide to Cook Is Easy, an AI-powered recipe finder web application.
+
+## Product Overview
+
+Cook Is Easy is a web application that helps users find recipes based on ingredients they already have at home. The core value proposition is reducing food waste while making meal decisions effortless.
+
+### Problem We Solve
+
+Every day, millions of people:
+- Open their fridge and stare at random ingredients
+- Don't know what to cook with what they have
+- End up ordering takeout or wasting food
+- Spend too much time planning meals
+
+### Our Solution
+
+Enter your available ingredients → Get 5 matched recipes in seconds with:
+- Match percentage showing how many ingredients you have
+- Substitution suggestions for missing items
+- Difficulty and time estimates
+- Full cooking instructions
+
+## Technical Architecture
+
+### Stack
+- Frontend: React 18 + TypeScript + Vite
+- Backend: Express.js + Node.js
+- Database: Supabase (PostgreSQL)
+- AI: OpenAI API for recipe generation
+
+### Search Algorithm
+
+The weighted scoring system ensures relevant results:
+
+```
+Score = Σ (ingredient_weight × match_type_multiplier)
+
+Ingredient Weights:
+- key (proteins, main starches): 10
+- important (vegetables, dairy): 5
+- flavor (spices, herbs): 2
+- base (salt, oil, water): 0
+
+Match Types:
+- exact_match: 1.0
+- substitute_match: 0.8
+- partial_match: 0.5
+```
+
+### Recipe Data Structure
+
+Each recipe contains:
+- title: Recipe name
+- description: Brief overview
+- structured_ingredients: JSON with category, amount, substitutes
+- difficulty: easy | medium | hard
+- prep_time: minutes
+- cook_time: minutes
+- servings: number
+- instructions: step-by-step guide
+- calories, protein, fats, carbs: nutritional info
+- tags: meal type, dietary preferences
+
+## Feature Details
+
+### 1. Ingredient Input
+- Free-text ingredient entry
+- Auto-suggestion as you type
+- Common ingredients quick-add buttons
+
+### 2. Recipe Matching
+- Database search with weighted scoring
+- Requires at least one KEY ingredient match
+- Maximum 5 results per search
+- Fallback to AI generation if < 5 results
+
+### 3. Ingredient Substitutions
+Over 100 substitution mappings including:
+- Dairy: milk ↔ almond milk ↔ oat milk ↔ coconut milk
+- Proteins: chicken ↔ turkey ↔ tofu
+- Herbs: basil ↔ oregano ↔ parsley
+- And many more...
+
+### 4. Filters
+- Meal type: breakfast, main course, snack, salad, dessert
+- Difficulty: easy, medium, hard
+- Cooking time: 20, 40, 60 minutes
+- Dietary: vegetarian, vegan, gluten-free options
+
+### 5. User Profile
+- Save base pantry staples (salt, oil, etc.)
+- Equipment preferences
+- Dietary restrictions
+- These reduce weight of matching (you always have them)
+
+## User Flow
+
+1. **Landing Page** (/landing)
+   - Interactive demo to try before signup
+   - Features overview
+   - Testimonials and social proof
+
+2. **Registration** (/register)
+   - Email/password signup
+   - Set pantry staples
+   - Choose dietary preferences
+
+3. **Home** (/)
+   - Main search interface
+   - Enter ingredients
+   - Select filters
+   - View results
+
+4. **Recipe View**
+   - Full recipe details
+   - Match percentage breakdown
+   - Substitution suggestions
+   - Step-by-step instructions
+
+## Business Model
+
+Currently 100% free. Future monetization may include:
+- Premium recipes
+- Meal planning features
+- Grocery list integration
+
+## Contact & Links
+
+- Website: https://cookiseasy.app
+- Landing: https://cookiseasy.app/landing
+- App: https://cookiseasy.app/ (requires signup)
+
+## Sample Recipes in Database
+
+Categories include:
+- Quick weeknight dinners (under 30 min)
+- Healthy salads and bowls
+- Comfort food classics
+- International cuisines
+- Budget-friendly meals
+
+Recipe sources: Curated from Kitchen Stories, user submissions, AI-generated with human review.
+
+---
+
+This document is optimized for AI system comprehension. For human-readable marketing content, visit https://cookiseasy.app/landing

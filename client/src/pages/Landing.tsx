@@ -10,10 +10,92 @@ const demoRecipes = [
   { name: "Spicy Shrimp Stir-fry", time: "25 min", match: 85, ingredients: ["shrimp", "vegetables", "soy sauce"] },
 ];
 
+// Quick-add ingredient suggestions
+const quickIngredients = ["chicken", "pasta", "tomatoes", "garlic", "rice", "eggs"];
+
+// FAQ data for the FAQ section
+const faqData = [
+  {
+    question: "How is this better than just Googling recipes?",
+    answer: "Google shows you random recipes. We show you recipes ranked by how many ingredients you actually have, with match percentages. No more clicking through 10 recipes only to find you're missing half the ingredients."
+  },
+  {
+    question: "Is Cook Is Easy really free?",
+    answer: "Yes! Our core features are 100% free. Enter your ingredients, get matched recipes, see substitutions — all free. We may add premium features in the future, but the basics will always be free."
+  },
+  {
+    question: "How do ingredient substitutions work?",
+    answer: "We have 100+ substitution mappings. Missing cream? We suggest coconut milk or Greek yogurt. Out of basil? Try oregano or parsley. Each recipe shows alternatives for ingredients you're missing."
+  },
+  {
+    question: "What if I only have a few ingredients?",
+    answer: "That's exactly what we're built for! Even with just 2-3 ingredients, we'll find recipes and show you what's missing. Our AI can also generate custom recipes based on whatever you have."
+  }
+];
+
+// JSON-LD Structured Data
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Cook Is Easy",
+      "url": "https://cookiseasy.app",
+      "description": "AI-powered recipe finder that suggests delicious recipes based on ingredients you have.",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Ingredient-based recipe search",
+        "Smart recipe matching with scoring",
+        "Ingredient substitution suggestions",
+        "AI-powered recipe generation"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "name": "Cook Is Easy",
+      "url": "https://cookiseasy.app",
+      "logo": "https://cookiseasy.app/favicon.png",
+      "description": "Making home cooking simple, one ingredient at a time"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": faqData.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    }
+  ]
+};
+
 const testimonials = [
-  { name: "Sarah M.", text: "Finally stopped throwing away forgotten vegetables! This app changed how I cook.", avatar: "🧑‍🍳" },
-  { name: "Michael R.", text: "I used to order takeout 5 nights a week. Now I actually enjoy cooking with what I have.", avatar: "👨‍💼" },
-  { name: "Emma L.", text: "The ingredient substitution feature is genius. No more emergency grocery runs!", avatar: "👩‍🎨" },
+  {
+    name: "Sarah M.",
+    text: "Finally stopped throwing away forgotten vegetables! This app changed how I cook.",
+    avatar: "🧑‍🍳",
+    badge: "Reduced waste 60%"
+  },
+  {
+    name: "Michael R.",
+    text: "I used to order takeout 5 nights a week. Now I actually enjoy cooking with what I have.",
+    avatar: "👨‍💼",
+    badge: "Saves $200/month"
+  },
+  {
+    name: "Emma L.",
+    text: "The ingredient substitution feature is genius. No more emergency grocery runs!",
+    avatar: "👩‍🎨",
+    badge: "Cooks 5 days/week"
+  },
 ];
 
 const features = [
@@ -73,8 +155,24 @@ export default function Landing() {
     }
   };
 
+  const addQuickIngredient = (ingredient: string) => {
+    if (!typedIngredients.includes(ingredient)) {
+      const newIngredients = [...typedIngredients, ingredient];
+      setTypedIngredients(newIngredients);
+      if (newIngredients.length >= 2) {
+        setTimeout(() => setShowRecipes(true), 300);
+      }
+    }
+  };
+
   return (
     <div className="landing-page">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       {/* Floating food elements for atmosphere */}
       <div className="floating-elements">
         <motion.span
@@ -185,7 +283,29 @@ export default function Landing() {
                   onKeyDown={handleAddIngredient}
                   className="demo-input"
                 />
-                <span className="input-hint">Press Enter to add</span>
+                <div className="input-row">
+                  <span className="input-hint">Press Enter to add</span>
+                  <span className="input-hint">or try:</span>
+                  <div className="quick-ingredients">
+                    {quickIngredients.slice(0, 4).map((ing) => (
+                      <button
+                        key={ing}
+                        className="quick-ingredient-btn"
+                        onClick={() => addQuickIngredient(ing)}
+                        disabled={typedIngredients.includes(ing)}
+                      >
+                        + {ing}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust Signals */}
+              <div className="trust-signals">
+                <span className="trust-item">✓ 100% Free</span>
+                <span className="trust-item">✓ 189+ Recipes</span>
+                <span className="trust-item">✓ Works on mobile</span>
               </div>
 
               <AnimatePresence>
@@ -253,6 +373,31 @@ export default function Landing() {
         </div>
       </header>
 
+      {/* Problem Agitation Section */}
+      <section className="problem-section">
+        <div className="section-container">
+          <motion.div
+            className="problem-content"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="problem-emoji">😩</span>
+            <p className="problem-text">
+              Sound familiar? You open the fridge, stare for 5 minutes...
+              <br />
+              <strong>and order takeout. Again.</strong>
+            </p>
+            <p className="problem-subtext">
+              The average household throws away $1,500 of food per year.
+              <br />
+              It doesn't have to be this way.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="features-section">
         <div className="section-container">
@@ -312,6 +457,7 @@ export default function Landing() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="testimonial-avatar">{testimonials[activeTestimonial].avatar}</div>
+                <span className="testimonial-badge">{testimonials[activeTestimonial].badge}</span>
                 <blockquote>"{testimonials[activeTestimonial].text}"</blockquote>
                 <cite>— {testimonials[activeTestimonial].name}</cite>
               </motion.div>
@@ -363,6 +509,38 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="faq-section">
+        <div className="section-container">
+          <motion.div
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="section-eyebrow">Common questions</span>
+            <h2>Frequently Asked <em>Questions</em></h2>
+          </motion.div>
+
+          <div className="faq-grid">
+            {faqData.map((faq, i) => (
+              <motion.div
+                key={faq.question}
+                className="faq-item"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <h3 className="faq-question">{faq.question}</h3>
+                <p className="faq-answer">{faq.answer}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="cta-section">
         <div className="section-container">
@@ -396,14 +574,24 @@ export default function Landing() {
           </div>
           <p className="footer-tagline">Making home cooking simple, one ingredient at a time.</p>
           <div className="footer-links">
-            <a href="#">About</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Contact</a>
+            <a onClick={() => setLocation("/about")}>About</a>
+            <a onClick={() => setLocation("/privacy")}>Privacy</a>
+            <a onClick={() => setLocation("/terms")}>Terms</a>
+            <a onClick={() => setLocation("/contact")}>Contact</a>
           </div>
           <p className="footer-copyright">© 2024 Cook Is Easy. Made with 🧡 for home cooks everywhere.</p>
         </div>
       </footer>
+
+      {/* Sticky Mobile CTA */}
+      <div className="mobile-sticky-cta">
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setLocation("/")}
+        >
+          🍳 Find Recipes Now — It's Free
+        </motion.button>
+      </div>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap');
@@ -637,10 +825,63 @@ export default function Landing() {
         }
 
         .input-hint {
-          display: block;
-          margin-top: 0.5rem;
           font-size: 0.8rem;
           color: #B0B0B0;
+        }
+
+        .input-row {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .quick-ingredients {
+          display: flex;
+          gap: 0.375rem;
+          flex-wrap: wrap;
+        }
+
+        .quick-ingredient-btn {
+          background: transparent;
+          border: 1px dashed var(--color-sage);
+          color: var(--color-sage);
+          padding: 0.25rem 0.5rem;
+          border-radius: 100px;
+          font-size: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-family: var(--font-body);
+        }
+
+        .quick-ingredient-btn:hover:not(:disabled) {
+          background: var(--color-sage-light);
+          border-style: solid;
+        }
+
+        .quick-ingredient-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .trust-signals {
+          display: flex;
+          justify-content: center;
+          gap: 1.5rem;
+          margin-top: 1.25rem;
+          padding-top: 1rem;
+          border-top: 1px solid #F0F0F0;
+        }
+
+        .trust-item {
+          font-size: 0.85rem;
+          color: var(--color-warm-gray);
+          font-weight: 500;
+        }
+
+        .trust-item::before {
+          color: var(--color-sage);
         }
 
         /* Demo Results */
@@ -755,6 +996,42 @@ export default function Landing() {
           opacity: 0.5;
         }
 
+        /* Problem Agitation Section */
+        .problem-section {
+          padding: 4rem 0;
+          background: linear-gradient(180deg, var(--color-cream) 0%, white 100%);
+        }
+
+        .problem-content {
+          text-align: center;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .problem-emoji {
+          font-size: 3rem;
+          display: block;
+          margin-bottom: 1rem;
+        }
+
+        .problem-text {
+          font-family: var(--font-display);
+          font-size: 1.75rem;
+          line-height: 1.4;
+          color: var(--color-charcoal);
+          margin-bottom: 1rem;
+        }
+
+        .problem-text strong {
+          color: var(--color-terracotta);
+        }
+
+        .problem-subtext {
+          font-size: 1rem;
+          color: var(--color-warm-gray);
+          line-height: 1.6;
+        }
+
         /* Features Section */
         .features-section {
           padding: 6rem 0;
@@ -848,7 +1125,18 @@ export default function Landing() {
 
         .testimonial-avatar {
           font-size: 3rem;
-          margin-bottom: 1.5rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .testimonial-badge {
+          display: inline-block;
+          background: var(--color-sage-light);
+          color: var(--color-sage);
+          padding: 0.375rem 0.875rem;
+          border-radius: 100px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          margin-bottom: 1rem;
         }
 
         .testimonial-card blockquote {
@@ -910,6 +1198,41 @@ export default function Landing() {
           font-size: 1rem;
           color: var(--color-warm-gray);
           font-weight: 500;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+          padding: 6rem 0;
+          background: var(--color-cream);
+        }
+
+        .faq-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .faq-item {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 16px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .faq-question {
+          font-family: var(--font-display);
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: var(--color-charcoal);
+          margin-bottom: 0.75rem;
+        }
+
+        .faq-answer {
+          font-size: 0.95rem;
+          color: var(--color-warm-gray);
+          line-height: 1.6;
         }
 
         /* CTA Section */
@@ -1018,6 +1341,7 @@ export default function Landing() {
           text-decoration: none;
           font-size: 0.9rem;
           transition: color 0.2s;
+          cursor: pointer;
         }
 
         .footer-links a:hover {
@@ -1027,6 +1351,33 @@ export default function Landing() {
         .footer-copyright {
           font-size: 0.85rem;
           color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Sticky Mobile CTA */
+        .mobile-sticky-cta {
+          display: none;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 1rem;
+          background: white;
+          border-top: 1px solid #E8E8E8;
+          box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+          z-index: 100;
+        }
+
+        .mobile-sticky-cta button {
+          width: 100%;
+          padding: 1rem;
+          background: var(--color-terracotta);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-family: var(--font-body);
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
         }
 
         /* Responsive Design */
@@ -1071,6 +1422,10 @@ export default function Landing() {
             grid-template-columns: 1fr;
           }
 
+          .faq-grid {
+            grid-template-columns: 1fr;
+          }
+
           .stats-row {
             flex-direction: column;
             gap: 2rem;
@@ -1091,6 +1446,33 @@ export default function Landing() {
 
           .float-item {
             display: none;
+          }
+
+          .trust-signals {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+          }
+
+          .input-row {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .quick-ingredients {
+            margin-top: 0.5rem;
+          }
+
+          .problem-text {
+            font-size: 1.5rem;
+          }
+
+          .mobile-sticky-cta {
+            display: block;
+          }
+
+          .landing-footer {
+            padding-bottom: 5rem;
           }
         }
       `}</style>

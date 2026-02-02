@@ -1,0 +1,20 @@
+{
+  "name": "Cook Is Easy - Recipe Finder",
+  "short_name": "Cook Is Easy",
+  "description": "AI-powered recipe finder by ingredients. Enter what you have, get delicious recipes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDF8F3",
+  "theme_color": "#C84B31",
+  "scope": "/",
+  "orientation": "portrait-primary",
+  "categories": ["food", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

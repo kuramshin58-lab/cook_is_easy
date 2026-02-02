@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema, recipeSchema, type MatchResult } from "@shared/schema";
+import { recipeRequestSchema, registerUserSchema, loginUserSchema, updateProfileSchema, recipeSchema, saveRecipeRequestSchema, unsaveRecipeRequestSchema, type MatchResult } from "@shared/schema";
 import { generateRecipes, adaptRecipe } from "./openai";
 import { searchRecipesInDatabase } from "./recipeSearch";
 import { calculateWeightedScore } from "./weightedScoring";
@@ -254,6 +254,254 @@ export async function registerRoutes(
       return res.status(500).json({ 
         error: "Failed to adapt recipe" 
       });
+    }
+  });
+
+  // Get all recipes from database with optional filters
+  app.get("/api/recipes/browse", async (req, res) => {
+    try {
+      const {
+        cookingTime,  // "quick" (<=30), "medium" (31-60), "long" (>60)
+        mealType,     // "breakfast", "main", "salad", "snack", "dessert"
+        mainIngredient, // "chicken", "beef", "pasta", "fish", etc.
+        difficulty,   // "easy", "medium", "hard"
+        search,       // text search
+        limit = "50",
+        offset = "0"
+      } = req.query;
+
+      let query = supabase
+        .from('recipes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // Apply cooking time filter
+      if (cookingTime === 'quick') {
+        query = query.lte('cook_time', 30);
+      } else if (cookingTime === 'medium') {
+        query = query.gt('cook_time', 30).lte('cook_time', 60);
+      } else if (cookingTime === 'long') {
+        query = query.gt('cook_time', 60);
+      }
+
+      // Apply difficulty filter
+      if (difficulty && typeof difficulty === 'string') {
+        query = query.ilike('difficulty', difficulty);
+      }
+
+      // Apply meal type filter (search in tags)
+      if (mealType && typeof mealType === 'string') {
+        query = query.contains('tags', [mealType]);
+      }
+
+      // Apply text search on title
+      if (search && typeof search === 'string') {
+        query = query.ilike('title', `%${search}%`);
+      }
+
+      // Apply pagination
+      const limitNum = Math.min(parseInt(limit as string) || 50, 100);
+      const offsetNum = parseInt(offset as string) || 0;
+      query = query.range(offsetNum, offsetNum + limitNum - 1);
+
+      const { data: recipes, error, count } = await query;
+
+      if (error) {
+        console.error("Error fetching recipes:", error);
+        return res.status(500).json({ error: "Failed to fetch recipes" });
+      }
+
+      // If mainIngredient filter is set, filter in code
+      // (since structured_ingredients is JSONB, complex filtering is easier in JS)
+      let filteredRecipes = recipes || [];
+
+      if (mainIngredient && typeof mainIngredient === 'string') {
+        const ingredientLower = mainIngredient.toLowerCase();
+        filteredRecipes = filteredRecipes.filter(recipe => {
+          // Check structured_ingredients first
+          if (recipe.structured_ingredients && Array.isArray(recipe.structured_ingredients)) {
+            return recipe.structured_ingredients.some((ing: any) =>
+              ing.name?.toLowerCase().includes(ingredientLower) &&
+              (ing.category === 'key' || ing.category === 'important')
+            );
+          }
+          // Fallback to legacy ingredients array
+          if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
+            return recipe.ingredients.some((ing: string) =>
+              ing.toLowerCase().includes(ingredientLower)
+            );
+          }
+          return false;
+        });
+      }
+
+      // Get unique main ingredients for filter options
+      const mainIngredientsSet = new Set<string>();
+      (recipes || []).forEach(recipe => {
+        if (recipe.structured_ingredients && Array.isArray(recipe.structured_ingredients)) {
+          recipe.structured_ingredients.forEach((ing: any) => {
+            if (ing.category === 'key' && ing.name) {
+              mainIngredientsSet.add(ing.name.toLowerCase());
+            }
+          });
+        }
+      });
+
+      return res.json({
+        recipes: filteredRecipes,
+        total: filteredRecipes.length,
+        filters: {
+          mainIngredients: Array.from(mainIngredientsSet).sort()
+        }
+      });
+    } catch (error) {
+      console.error("Error in browse recipes:", error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  // Save a recipe
+  app.post("/api/recipes/save", async (req, res) => {
+    try {
+      const validationResult = saveRecipeRequestSchema.safeParse(req.body);
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Invalid request",
+          details: validationResult.error.errors
+        });
+      }
+
+      const { userId, recipeId, recipeTitle, recipeData, isFromDatabase } = validationResult.data;
+
+      const { data, error } = await supabase
+        .from('saved_recipes')
+        .upsert({
+          user_id: userId,
+          recipe_id: recipeId || null,
+          recipe_title: recipeTitle,
+          recipe_data: recipeData || null,
+          is_from_database: isFromDatabase
+        }, {
+          onConflict: 'user_id,recipe_title'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error saving recipe:", error);
+        return res.status(500).json({ error: "Failed to save recipe" });
+      }
+
+      return res.json({ saved: true, data });
+    } catch (error) {
+      console.error("Error in save recipe:", error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  // Unsave a recipe
+  app.delete("/api/recipes/save", async (req, res) => {
+    try {
+      const validationResult = unsaveRecipeRequestSchema.safeParse(req.body);
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Invalid request",
+          details: validationResult.error.errors
+        });
+      }
+
+      const { userId, recipeTitle } = validationResult.data;
+
+      const { error } = await supabase
+        .from('saved_recipes')
+        .delete()
+        .eq('user_id', userId)
+        .eq('recipe_title', recipeTitle);
+
+      if (error) {
+        console.error("Error unsaving recipe:", error);
+        return res.status(500).json({ error: "Failed to unsave recipe" });
+      }
+
+      return res.json({ saved: false });
+    } catch (error) {
+      console.error("Error in unsave recipe:", error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  // Get all saved recipes for a user
+  app.get("/api/recipes/saved", async (req, res) => {
+    try {
+      const { userId } = req.query;
+
+      if (!userId || typeof userId !== 'string') {
+        return res.status(400).json({ error: "userId is required" });
+      }
+
+      const { data: savedRecipes, error } = await supabase
+        .from('saved_recipes')
+        .select('*')
+        .eq('user_id', userId)
+        .order('saved_at', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching saved recipes:", error);
+        return res.status(500).json({ error: "Failed to fetch saved recipes" });
+      }
+
+      // For database recipes, fetch full recipe data
+      const enrichedRecipes = await Promise.all(
+        (savedRecipes || []).map(async (saved) => {
+          if (saved.is_from_database && saved.recipe_id) {
+            const { data: dbRecipe } = await supabase
+              .from('recipes')
+              .select('*')
+              .eq('id', saved.recipe_id)
+              .single();
+
+            if (dbRecipe) {
+              return { ...saved, db_recipe: dbRecipe };
+            }
+          }
+          return saved;
+        })
+      );
+
+      return res.json({ recipes: enrichedRecipes });
+    } catch (error) {
+      console.error("Error in get saved recipes:", error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  // Check if a recipe is saved
+  app.get("/api/recipes/saved/check", async (req, res) => {
+    try {
+      const { userId, title } = req.query;
+
+      if (!userId || typeof userId !== 'string' || !title || typeof title !== 'string') {
+        return res.status(400).json({ error: "userId and title are required" });
+      }
+
+      const { data, error } = await supabase
+        .from('saved_recipes')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('recipe_title', title)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking saved recipe:", error);
+        return res.status(500).json({ error: "Failed to check saved recipe" });
+      }
+
+      return res.json({ isSaved: !!data });
+    } catch (error) {
+      console.error("Error in check saved recipe:", error);
+      return res.status(500).json({ error: "Server error" });
     }
   });
 

@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User, Sparkles, BookOpen } from "lucide-react";
+import { LogIn, LogOut, User, Sparkles, BookOpen, Heart } from "lucide-react";
 
 interface HeaderProps {
   user: { name: string; email: string } | null;
@@ -12,6 +12,7 @@ export function Header({ user, onLogout }: HeaderProps) {
 
   const isAiRecipes = location === "/" || location === "/recipes";
   const isReadyRecipes = location === "/ready-recipes";
+  const isSavedRecipes = location === "/saved";
 
   return (
     <header className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50">
@@ -55,6 +56,20 @@ export function Header({ user, onLogout }: HeaderProps) {
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Recipes</span>
             </button>
+            {user && (
+              <button
+                onClick={() => setLocation("/saved")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  isSavedRecipes
+                    ? "bg-white text-red-500 shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid="tab-saved-recipes"
+              >
+                <Heart className={`h-4 w-4 ${isSavedRecipes ? "fill-current" : ""}`} />
+                <span className="hidden sm:inline">Saved</span>
+              </button>
+            )}
           </nav>
         </div>
 

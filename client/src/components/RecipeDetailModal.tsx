@@ -13,6 +13,7 @@ import { Clock, Lightbulb, Check, X, RefreshCw, Flame, Wand2, ArrowRight, Loader
 import type { Recipe, StructuredIngredient, MatchType } from "@shared/schema";
 import { getMatchTypeDisplay, getCategoryDisplay, countMatchTypes, isIngredientAvailable, calculateMatchPercentage } from "@/lib/ingredientMatching";
 import { apiRequest } from "@/lib/queryClient";
+import { SaveHeartButton } from "./SaveHeartButton";
 
 interface Substitution {
   original: string;
@@ -101,9 +102,18 @@ export function RecipeDetailModal({ recipe, userIngredients, open, onOpenChange 
         <div className="bg-gradient-to-br from-primary/15 via-secondary/10 to-accent/15 p-6 pb-5">
           <DialogHeader>
             <div className="flex items-start gap-4">
-              {/* Recipe emoji */}
-              <div className="w-14 h-14 rounded-2xl bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md shrink-0">
-                <span className="text-3xl">{emoji}</span>
+              {/* Recipe emoji with save button */}
+              <div className="relative shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md">
+                  <span className="text-3xl">{emoji}</span>
+                </div>
+                <SaveHeartButton
+                  recipe={{ title: displayRecipe.title }}
+                  recipeData={displayRecipe}
+                  isFromDatabase={displayRecipe.isFromDatabase ?? false}
+                  size="sm"
+                  className="absolute -top-1 -right-1 shadow-sm"
+                />
               </div>
 
               <div className="flex-1 min-w-0">
