@@ -24,8 +24,10 @@ function AppContent() {
 
   return (
     <Switch>
+      {/* Landing page as root */}
+      <Route path="/" component={Landing} />
+
       {/* Static pages without header */}
-      <Route path="/landing" component={Landing} />
       <Route path="/about" component={About} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
@@ -37,7 +39,7 @@ function AppContent() {
           <Header user={user} onLogout={logout} />
           <main className="flex-1">
             <Switch>
-              <Route path="/" component={Home} />
+              <Route path="/app" component={Home} />
               <Route path="/recipes" component={Recipes} />
               <Route path="/ready-recipes" component={ReadyRecipes} />
               <Route path="/saved" component={SavedRecipes} />

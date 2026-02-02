@@ -10,7 +10,7 @@ interface HeaderProps {
 export function Header({ user, onLogout }: HeaderProps) {
   const [location, setLocation] = useLocation();
 
-  const isAiRecipes = location === "/" || location === "/recipes";
+  const isAiRecipes = location === "/app" || location === "/recipes";
   const isReadyRecipes = location === "/ready-recipes";
   const isSavedRecipes = location === "/saved";
 
@@ -20,7 +20,7 @@ export function Header({ user, onLogout }: HeaderProps) {
         <div className="flex items-center gap-6">
           {/* Logo */}
           <button
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation("/app")}
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
             data-testid="link-home"
           >
@@ -33,7 +33,7 @@ export function Header({ user, onLogout }: HeaderProps) {
           {/* Navigation Tabs */}
           <nav className="flex gap-1 bg-muted/60 rounded-full p-1">
             <button
-              onClick={() => setLocation("/")}
+              onClick={() => setLocation("/app")}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 isAiRecipes
                   ? "bg-white text-primary shadow-sm"
