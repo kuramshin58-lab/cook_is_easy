@@ -28,7 +28,7 @@ export default function Contact() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            onClick={() => setLocation("/landing")}
+            onClick={() => setLocation("/")}
             style={{ cursor: "pointer" }}
           >
             <span className="logo-icon">🍳</span>
@@ -39,7 +39,7 @@ export default function Contact() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation("/app")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
