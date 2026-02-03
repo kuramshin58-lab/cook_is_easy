@@ -229,7 +229,7 @@ export const Phase2Solution: React.FC = () => {
                   color: colors.charcoal,
                 }}
               >
-                Cook Is Easy
+                Fridgely
               </span>
             </div>
 

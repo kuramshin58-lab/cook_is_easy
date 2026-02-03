@@ -13,7 +13,7 @@
     "remotion:render": "remotion render client/src/remotion/index.ts RecipeVideo out/recipe-video.mp4",
     "remotion:render:square": "remotion render client/src/remotion/index.ts RecipeVideoSquare out/recipe-video-square.mp4",
     "remotion:render:horizontal": "remotion render client/src/remotion/index.ts RecipeVideoHorizontal out/recipe-video-horizontal.mp4",
-    "remotion:render:ad": "remotion render client/src/remotion/index.ts CookIsEasyAd out/cook-is-easy-ad.mp4"
+    "remotion:render:ad": "remotion render client/src/remotion/index.ts FridgelyAd out/fridgely-ad.mp4"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -1,4 +1,4 @@
-// Kinetic Typography Scenes for Cook Is Easy Ad
+// Kinetic Typography Scenes for Fridgely Ad
 // 45-second video optimized for TikTok/Reels/Shorts
 
 export { Scene1Hook } from './Scene1Hook';

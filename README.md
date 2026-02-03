@@ -1,4 +1,4 @@
-# Cook Is Easy
+# Fridgely
 
 Recipe search application that helps you find what to cook based on ingredients you already have.
 
@@ -36,8 +36,8 @@ Recipe search application that helps you find what to cook based on ingredients 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/cook-is-easy.git
-cd cook-is-easy
+git clone https://github.com/yourusername/fridgely.git
+cd fridgely
 
 # Install dependencies
 npm install

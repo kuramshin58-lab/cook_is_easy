@@ -7,7 +7,7 @@ import { colors, typography, spacing } from '../theme';
  *
  * Voiceover:
  * "Забудь про это."
- * "Просто открой Cook Is Easy."
+ * "Просто открой Fridgely."
  * "Выбери что у тебя есть..."
  *
  * Visual: Swipe transition, logo reveal, app interface
@@ -105,7 +105,7 @@ export const Scene3Solution: React.FC = () => {
 
   // Scene timeline (8 seconds = 480 frames)
   // 0-60: Swipe transition "Забудь про это"
-  // 60-180: Logo appears with "Просто открой Cook Is Easy"
+  // 60-180: Logo appears with "Просто открой Fridgely"
   // 180-480: Phone UI with ingredient selection
 
   // Swipe wipe transition
@@ -220,7 +220,7 @@ export const Scene3Solution: React.FC = () => {
               color: colors.charcoal,
             }}
           >
-            Cook Is Easy
+            Fridgely
           </div>
 
           {/* Subtitle */}
@@ -271,7 +271,7 @@ export const Scene3Solution: React.FC = () => {
                 textAlign: 'center',
               }}
             >
-              🍳 Cook Is Easy
+              🍳 Fridgely
             </div>
 
             {/* "Выбери что у тебя есть" text */}

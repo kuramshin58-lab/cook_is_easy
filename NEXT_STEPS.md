@@ -1,4 +1,4 @@
-# Cook Is Easy - Project Status
+# Fridgely - Project Status
 
 Last updated: 2026-02-02
 

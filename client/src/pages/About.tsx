@@ -17,7 +17,7 @@ export default function About() {
             style={{ cursor: "pointer" }}
           >
             <span className="logo-icon">🍳</span>
-            <span className="logo-text">Cook Is Easy</span>
+            <span className="logo-text">Fridgely</span>
           </motion.div>
           <motion.button
             className="nav-cta"
@@ -40,12 +40,12 @@ export default function About() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1>About Cook Is Easy</h1>
+          <h1>About Fridgely</h1>
 
           <section className="about-hero">
             <p className="lead">
               We believe that great home cooking shouldn't require a trip to the grocery store.
-              Cook Is Easy helps you discover delicious recipes using ingredients you already have.
+              Fridgely helps you discover delicious recipes using ingredients you already have.
             </p>
           </section>
 
@@ -144,7 +144,7 @@ export default function About() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setLocation("/login")}
             >
-              🍳 Try Cook Is Easy Free
+              🍳 Try Fridgely Free
             </motion.button>
           </section>
         </motion.div>
@@ -158,7 +158,7 @@ export default function About() {
             <a onClick={() => setLocation("/terms")}>Terms</a>
             <a onClick={() => setLocation("/contact")}>Contact</a>
           </div>
-          <p className="footer-copyright">© 2024 Cook Is Easy. Made with 🧡 for home cooks everywhere.</p>
+          <p className="footer-copyright">© 2024 Fridgely. Made with 🧡 for home cooks everywhere.</p>
         </div>
       </footer>
 

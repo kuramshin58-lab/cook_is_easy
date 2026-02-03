@@ -1,4 +1,4 @@
-# Cook Is Easy - Robots.txt
+# Fridgely - Robots.txt
 User-agent: *
 Allow: /
 Allow: /landing
@@ -30,7 +30,7 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemaps
-Sitemap: https://cookiseasy.app/sitemap.xml
+Sitemap: https://fridgely.app/sitemap.xml
 
 # LLM Context
 # See /llms.txt for AI-friendly content summary

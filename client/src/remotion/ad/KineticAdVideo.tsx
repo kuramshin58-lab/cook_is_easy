@@ -11,7 +11,7 @@ import { Scene5Result } from './kinetic/Scene5Result';
 import { Scene6CTA } from './kinetic/Scene6CTA';
 
 /**
- * Cook Is Easy - Kinetic Typography Ad Video
+ * Fridgely - Kinetic Typography Ad Video
  *
  * 45-second ad optimized for TikTok/Reels/Shorts
  * Format: 9:16 (1080x1920) at 60fps
@@ -19,10 +19,10 @@ import { Scene6CTA } from './kinetic/Scene6CTA';
  * Structure based on SCRIPT.md:
  * - Hook (0-3 sec): "7 вечера. Открываешь холодильник..."
  * - Problem (3-10 sec): "...и понятия не имеешь что приготовить"
- * - Solution (10-18 sec): "Забудь про это. Открой Cook Is Easy"
+ * - Solution (10-18 sec): "Забудь про это. Открой Fridgely"
  * - Demo (18-32 sec): "Нажми поиск... БАМ! 47 рецептов"
  * - Result (32-40 sec): "Через полчаса... Ужин готов"
- * - CTA (40-45 sec): "Cook Is Easy. Скачай бесплатно"
+ * - CTA (40-45 sec): "Fridgely. Скачай бесплатно"
  */
 
 /*
@@ -107,11 +107,11 @@ export const KineticAdVideo: React.FC = () => {
         <Scene2Problem />
       </Sequence>
 
-      {/* Scene 3: Solution - "Забудь про это. Открой Cook Is Easy" */}
+      {/* Scene 3: Solution - "Забудь про это. Открой Fridgely" */}
       <Sequence
         from={SCENE_TIMING.solution.from}
         durationInFrames={SCENE_TIMING.solution.duration}
-        name="Solution: Cook Is Easy"
+        name="Solution: Fridgely"
       >
         <Scene3Solution />
       </Sequence>
@@ -134,7 +134,7 @@ export const KineticAdVideo: React.FC = () => {
         <Scene5Result />
       </Sequence>
 
-      {/* Scene 6: CTA - "Cook Is Easy. Скачай бесплатно" */}
+      {/* Scene 6: CTA - "Fridgely. Скачай бесплатно" */}
       <Sequence
         from={SCENE_TIMING.cta.from}
         durationInFrames={SCENE_TIMING.cta.duration}
@@ -148,7 +148,7 @@ export const KineticAdVideo: React.FC = () => {
 
 // Export video configuration for composition registration
 export const kineticAdVideoConfig = {
-  id: 'CookIsEasyKinetic',
+  id: 'FridgelyKinetic',
   component: KineticAdVideo,
   durationInFrames: videoConfig.durationInSeconds * videoConfig.fps, // 2700 frames (45 seconds at 60fps)
   fps: videoConfig.fps,

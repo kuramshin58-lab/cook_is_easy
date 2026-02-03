@@ -80,7 +80,7 @@ export const AdVideo: React.FC = () => {
         <Phase1Problem />
       </Sequence>
 
-      {/* Phase 2: The Solution - "Meet Cook Is Easy" */}
+      {/* Phase 2: The Solution - "Meet Fridgely" */}
       <Sequence
         from={PHASE_TIMING.phase2.from}
         durationInFrames={PHASE_TIMING.phase2.duration}
@@ -116,7 +116,7 @@ export const AdVideo: React.FC = () => {
         <Phase5Outcome />
       </Sequence>
 
-      {/* Phase 6: Call to Action - "Try Cook Is Easy" */}
+      {/* Phase 6: Call to Action - "Try Fridgely" */}
       <Sequence
         from={PHASE_TIMING.phase6.from}
         durationInFrames={PHASE_TIMING.phase6.duration}
@@ -130,7 +130,7 @@ export const AdVideo: React.FC = () => {
 
 // Export video configuration for composition registration
 export const adVideoConfig = {
-  id: 'CookIsEasyAd',
+  id: 'FridgelyAd',
   component: AdVideo,
   durationInFrames: videoConfig.durationInSeconds * videoConfig.fps, // 3600 frames (60 seconds at 60fps)
   fps: videoConfig.fps,

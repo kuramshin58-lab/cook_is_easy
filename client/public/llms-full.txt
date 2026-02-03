@@ -1,10 +1,10 @@
-# Cook Is Easy - Full Documentation for AI Systems
+# Fridgely - Full Documentation for AI Systems
 
-> Comprehensive guide to Cook Is Easy, an AI-powered recipe finder web application.
+> Comprehensive guide to Fridgely, an AI-powered recipe finder web application.
 
 ## Product Overview
 
-Cook Is Easy is a web application that helps users find recipes based on ingredients they already have at home. The core value proposition is reducing food waste while making meal decisions effortless.
+Fridgely is a web application that helps users find recipes based on ingredients they already have at home. The core value proposition is reducing food waste while making meal decisions effortless.
 
 ### Problem We Solve
 
@@ -128,9 +128,9 @@ Currently 100% free. Future monetization may include:
 
 ## Contact & Links
 
-- Website: https://cookiseasy.app
-- Landing: https://cookiseasy.app/landing
-- App: https://cookiseasy.app/ (requires signup)
+- Website: https://fridgely.app
+- Landing: https://fridgely.app/landing
+- App: https://fridgely.app/ (requires signup)
 
 ## Sample Recipes in Database
 
@@ -145,4 +145,4 @@ Recipe sources: Curated from Kitchen Stories, user submissions, AI-generated wit
 
 ---
 
-This document is optimized for AI system comprehension. For human-readable marketing content, visit https://cookiseasy.app/landing
+This document is optimized for AI system comprehension. For human-readable marketing content, visit https://fridgely.app/landing

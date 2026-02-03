@@ -1,8 +1,8 @@
-# Cook Is Easy
+# Fridgely
 
 > AI-powered recipe finder that suggests delicious recipes based on ingredients you have. Free web app with smart matching and ingredient substitutions. Stop wasting food, start cooking amazing meals.
 
-Cook Is Easy solves a common problem: you open your fridge, see random ingredients, and don't know what to cook. Our app takes your available ingredients and finds matching recipes from a curated database of 189+ recipes.
+Fridgely solves a common problem: you open your fridge, see random ingredients, and don't know what to cook. Our app takes your available ingredients and finds matching recipes from a curated database of 189+ recipes.
 
 ## Key Features
 
@@ -34,12 +34,12 @@ Cook Is Easy solves a common problem: you open your fridge, see random ingredien
 
 ## Links
 
-- [Landing Page](https://cookiseasy.app/landing): Marketing page with interactive demo
-- [Main App](https://cookiseasy.app/): Recipe search interface (requires signup)
-- [About](https://cookiseasy.app/about): Company mission and values
-- [Privacy Policy](https://cookiseasy.app/privacy): How we handle your data
-- [Terms of Service](https://cookiseasy.app/terms): Usage terms and conditions
-- [Contact](https://cookiseasy.app/contact): Get in touch with us
+- [Landing Page](https://fridgely.app/landing): Marketing page with interactive demo
+- [Main App](https://fridgely.app/): Recipe search interface (requires signup)
+- [About](https://fridgely.app/about): Company mission and values
+- [Privacy Policy](https://fridgely.app/privacy): How we handle your data
+- [Terms of Service](https://fridgely.app/terms): Usage terms and conditions
+- [Contact](https://fridgely.app/contact): Get in touch with us
 
 ## Stats
 

@@ -62,7 +62,7 @@ const TitleSlide: React.FC<{ title: string; difficulty: string; prepTime: number
         >
           <Badge icon="⏱️" text={`${prepTime + cookTime} min`} />
           <Badge icon="📊" text={difficulty} />
-          <Badge icon="🍳" text="Cook Is Easy" />
+          <Badge icon="🍳" text="Fridgely" />
         </div>
       </div>
     </AbsoluteFill>
@@ -252,7 +252,7 @@ const OutroSlide: React.FC<{ title: string }> = ({ title }) => {
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          Made with Cook Is Easy
+          Made with Fridgely
         </p>
       </div>
     </AbsoluteFill>

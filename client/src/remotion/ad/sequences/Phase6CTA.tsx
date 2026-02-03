@@ -151,7 +151,7 @@ export const Phase6CTA: React.FC = () => {
             opacity: logoScale,
           }}
         >
-          Cook Is Easy
+          Fridgely
         </h1>
 
         {/* Stats row */}
@@ -268,7 +268,7 @@ export const Phase6CTA: React.FC = () => {
                   color: colors.warmOrange,
                 }}
               >
-                Try Cook Is Easy
+                Try Fridgely
               </span>
             </div>
           </div>

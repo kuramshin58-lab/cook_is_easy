@@ -17,7 +17,7 @@ export default function Privacy() {
             style={{ cursor: "pointer" }}
           >
             <span className="logo-icon">🍳</span>
-            <span className="logo-text">Cook Is Easy</span>
+            <span className="logo-text">Fridgely</span>
           </motion.div>
           <motion.button
             className="nav-cta"
@@ -46,7 +46,7 @@ export default function Privacy() {
           <section>
             <h2>Introduction</h2>
             <p>
-              At Cook Is Easy ("we", "our", or "us"), we respect your privacy and are committed
+              At Fridgely ("we", "our", or "us"), we respect your privacy and are committed
               to protecting your personal data. This privacy policy explains how we collect, use,
               and safeguard your information when you use our recipe finder service.
             </p>
@@ -138,7 +138,7 @@ export default function Privacy() {
               <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
             </ul>
             <p>
-              To exercise these rights, contact us at privacy@cookiseasy.app
+              To exercise these rights, contact us at privacy@fridgely.app
             </p>
           </section>
 
@@ -175,7 +175,7 @@ export default function Privacy() {
               please contact us at:
             </p>
             <p>
-              <strong>Email:</strong> privacy@cookiseasy.app
+              <strong>Email:</strong> privacy@fridgely.app
             </p>
           </section>
         </motion.div>
@@ -189,7 +189,7 @@ export default function Privacy() {
             <a onClick={() => setLocation("/terms")}>Terms</a>
             <a onClick={() => setLocation("/contact")}>Contact</a>
           </div>
-          <p className="footer-copyright">© 2024 Cook Is Easy. Made with 🧡 for home cooks everywhere.</p>
+          <p className="footer-copyright">© 2024 Fridgely. Made with 🧡 for home cooks everywhere.</p>
         </div>
       </footer>
 

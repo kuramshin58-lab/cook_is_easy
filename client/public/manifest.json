@@ -1,6 +1,6 @@
 {
-  "name": "Cook Is Easy - Recipe Finder",
-  "short_name": "Cook Is Easy",
+  "name": "Fridgely - Recipe Finder",
+  "short_name": "Fridgely",
   "description": "AI-powered recipe finder by ingredients. Enter what you have, get delicious recipes.",
   "start_url": "/",
   "display": "standalone",

@@ -62,7 +62,7 @@ export const AppLogo: React.FC<AppLogoProps> = ({ animated = true, scale = 1 }) 
             lineHeight: 1,
           }}
         >
-          Cook Is Easy
+          Fridgely
         </h1>
         <p
           style={{

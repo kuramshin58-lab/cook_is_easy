@@ -20,7 +20,7 @@ const faqData = [
     answer: "Google shows you random recipes. We show you recipes ranked by how many ingredients you actually have, with match percentages. No more clicking through 10 recipes only to find you're missing half the ingredients."
   },
   {
-    question: "Is Cook Is Easy really free?",
+    question: "Is Fridgely really free?",
     answer: "Yes! Our core features are 100% free. Enter your ingredients, get matched recipes, see substitutions — all free. We may add premium features in the future, but the basics will always be free."
   },
   {
@@ -39,8 +39,8 @@ const structuredData = {
   "@graph": [
     {
       "@type": "WebApplication",
-      "name": "Cook Is Easy",
-      "url": "https://cookiseasy.app",
+      "name": "Fridgely",
+      "url": "https://fridgely.app",
       "description": "AI-powered recipe finder that suggests delicious recipes based on ingredients you have.",
       "applicationCategory": "LifestyleApplication",
       "operatingSystem": "Web",
@@ -58,9 +58,9 @@ const structuredData = {
     },
     {
       "@type": "Organization",
-      "name": "Cook Is Easy",
-      "url": "https://cookiseasy.app",
-      "logo": "https://cookiseasy.app/favicon.png",
+      "name": "Fridgely",
+      "url": "https://fridgely.app",
+      "logo": "https://fridgely.app/favicon.png",
       "description": "Making home cooking simple, one ingredient at a time"
     },
     {
@@ -211,7 +211,7 @@ export default function Landing() {
             transition={{ duration: 0.6 }}
           >
             <span className="logo-icon">🍳</span>
-            <span className="logo-text">Cook Is Easy</span>
+            <span className="logo-text">Fridgely</span>
           </motion.div>
           <motion.button
             className="nav-cta"
@@ -570,7 +570,7 @@ export default function Landing() {
         <div className="footer-content">
           <div className="footer-logo">
             <span className="logo-icon">🍳</span>
-            <span className="logo-text">Cook Is Easy</span>
+            <span className="logo-text">Fridgely</span>
           </div>
           <p className="footer-tagline">Making home cooking simple, one ingredient at a time.</p>
           <div className="footer-links">
@@ -579,7 +579,7 @@ export default function Landing() {
             <a onClick={() => setLocation("/terms")}>Terms</a>
             <a onClick={() => setLocation("/contact")}>Contact</a>
           </div>
-          <p className="footer-copyright">© 2024 Cook Is Easy. Made with 🧡 for home cooks everywhere.</p>
+          <p className="footer-copyright">© 2024 Fridgely. Made with 🧡 for home cooks everywhere.</p>
         </div>
       </footer>
 

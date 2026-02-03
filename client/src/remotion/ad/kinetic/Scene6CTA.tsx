@@ -6,7 +6,7 @@ import { colors, typography, spacing } from '../theme';
  * Scene 6: CTA (40-45 seconds = 300 frames)
  *
  * Voiceover:
- * "Cook Is Easy. 365 рецептов из того, что есть."
+ * "Fridgely. 365 рецептов из того, что есть."
  * "Скачай бесплатно."
  *
  * Visual: Logo, statistics with number tween, CTA button
@@ -245,7 +245,7 @@ export const Scene6CTA: React.FC = () => {
             letterSpacing: -1,
           }}
         >
-          Cook Is Easy
+          Fridgely
         </div>
 
         {/* Tagline */}

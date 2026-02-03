@@ -17,7 +17,7 @@ export default function Terms() {
             style={{ cursor: "pointer" }}
           >
             <span className="logo-icon">🍳</span>
-            <span className="logo-text">Cook Is Easy</span>
+            <span className="logo-text">Fridgely</span>
           </motion.div>
           <motion.button
             className="nav-cta"
@@ -46,7 +46,7 @@ export default function Terms() {
           <section>
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using Cook Is Easy ("the Service"), you agree to be bound by these
+              By accessing or using Fridgely ("the Service"), you agree to be bound by these
               Terms of Service. If you do not agree to these terms, please do not use our Service.
             </p>
           </section>
@@ -54,7 +54,7 @@ export default function Terms() {
           <section>
             <h2>2. Description of Service</h2>
             <p>
-              Cook Is Easy is a recipe discovery platform that helps users find recipes based on
+              Fridgely is a recipe discovery platform that helps users find recipes based on
               available ingredients. Our Service includes:
             </p>
             <ul>
@@ -114,7 +114,7 @@ export default function Terms() {
             <p>
               <strong>Important:</strong> While we provide dietary tags and allergen information,
               this information may not be complete or accurate. If you have food allergies or
-              dietary restrictions, always verify ingredients independently. Cook Is Easy is not
+              dietary restrictions, always verify ingredients independently. Fridgely is not
               responsible for allergic reactions or dietary complications.
             </p>
           </section>
@@ -122,7 +122,7 @@ export default function Terms() {
           <section>
             <h2>6. Intellectual Property</h2>
             <p>
-              The Service, including its design, features, and content, is owned by Cook Is Easy
+              The Service, including its design, features, and content, is owned by Fridgely
               and protected by intellectual property laws. You may not:
             </p>
             <ul>
@@ -139,7 +139,7 @@ export default function Terms() {
           <section>
             <h2>7. Free Service</h2>
             <p>
-              Cook Is Easy is currently provided free of charge. We reserve the right to:
+              Fridgely is currently provided free of charge. We reserve the right to:
             </p>
             <ul>
               <li>Introduce premium features in the future</li>
@@ -186,7 +186,7 @@ export default function Terms() {
           <section>
             <h2>10. Indemnification</h2>
             <p>
-              You agree to indemnify and hold harmless Cook Is Easy, its officers, directors,
+              You agree to indemnify and hold harmless Fridgely, its officers, directors,
               employees, and agents from any claims, damages, or expenses arising from your
               use of the Service or violation of these terms.
             </p>
@@ -224,7 +224,7 @@ export default function Terms() {
               For questions about these Terms of Service, please contact us at:
             </p>
             <p>
-              <strong>Email:</strong> legal@cookiseasy.app
+              <strong>Email:</strong> legal@fridgely.app
             </p>
           </section>
         </motion.div>
@@ -238,7 +238,7 @@ export default function Terms() {
             <a onClick={() => setLocation("/terms")}>Terms</a>
             <a onClick={() => setLocation("/contact")}>Contact</a>
           </div>
-          <p className="footer-copyright">© 2024 Cook Is Easy. Made with 🧡 for home cooks everywhere.</p>
+          <p className="footer-copyright">© 2024 Fridgely. Made with 🧡 for home cooks everywhere.</p>
         </div>
       </footer>
 

@@ -75,7 +75,7 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={defaultRecipeProps}
       />
 
-      {/* Cook Is Easy Advertisement Video - 60 seconds at 60fps */}
+      {/* Fridgely Advertisement Video - 60 seconds at 60fps */}
       <Composition
         id={adVideoConfig.id}
         component={adVideoConfig.component}
@@ -85,7 +85,7 @@ export const RemotionRoot: React.FC = () => {
         height={adVideoConfig.height}
       />
 
-      {/* Cook Is Easy Kinetic Typography Ad - 45 seconds at 60fps */}
+      {/* Fridgely Kinetic Typography Ad - 45 seconds at 60fps */}
       <Composition
         id={kineticAdVideoConfig.id}
         component={kineticAdVideoConfig.component}

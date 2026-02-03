@@ -32,7 +32,7 @@ export default function Contact() {
             style={{ cursor: "pointer" }}
           >
             <span className="logo-icon">🍳</span>
-            <span className="logo-text">Cook Is Easy</span>
+            <span className="logo-text">Fridgely</span>
           </motion.div>
           <motion.button
             className="nav-cta"
@@ -66,28 +66,28 @@ export default function Contact() {
                 <span className="info-icon">📧</span>
                 <h3>Email</h3>
                 <p>For general inquiries:</p>
-                <a href="mailto:hello@cookiseasy.app">hello@cookiseasy.app</a>
+                <a href="mailto:hello@fridgely.app">hello@fridgely.app</a>
               </div>
 
               <div className="info-card">
                 <span className="info-icon">🐛</span>
                 <h3>Bug Reports</h3>
                 <p>Found a bug? Let us know:</p>
-                <a href="mailto:bugs@cookiseasy.app">bugs@cookiseasy.app</a>
+                <a href="mailto:bugs@fridgely.app">bugs@fridgely.app</a>
               </div>
 
               <div className="info-card">
                 <span className="info-icon">💡</span>
                 <h3>Feature Requests</h3>
-                <p>Have an idea for Cook Is Easy?</p>
-                <a href="mailto:ideas@cookiseasy.app">ideas@cookiseasy.app</a>
+                <p>Have an idea for Fridgely?</p>
+                <a href="mailto:ideas@fridgely.app">ideas@fridgely.app</a>
               </div>
 
               <div className="info-card">
                 <span className="info-icon">🤝</span>
                 <h3>Partnerships</h3>
                 <p>Business inquiries:</p>
-                <a href="mailto:partners@cookiseasy.app">partners@cookiseasy.app</a>
+                <a href="mailto:partners@fridgely.app">partners@fridgely.app</a>
               </div>
             </div>
 
@@ -189,15 +189,15 @@ export default function Contact() {
               </div>
               <div className="faq-item">
                 <h3>Can I request a new feature?</h3>
-                <p>Absolutely! We love hearing from our users. Send your ideas to ideas@cookiseasy.app.</p>
+                <p>Absolutely! We love hearing from our users. Send your ideas to ideas@fridgely.app.</p>
               </div>
               <div className="faq-item">
                 <h3>I found a bug, what should I do?</h3>
-                <p>Please email bugs@cookiseasy.app with details about what happened and steps to reproduce.</p>
+                <p>Please email bugs@fridgely.app with details about what happened and steps to reproduce.</p>
               </div>
               <div className="faq-item">
                 <h3>Are you on social media?</h3>
-                <p>We're working on it! Follow us soon on Instagram and Twitter @cookiseasy.</p>
+                <p>We're working on it! Follow us soon on Instagram and Twitter @fridgely.</p>
               </div>
             </div>
           </section>
@@ -212,7 +212,7 @@ export default function Contact() {
             <a onClick={() => setLocation("/terms")}>Terms</a>
             <a onClick={() => setLocation("/contact")}>Contact</a>
           </div>
-          <p className="footer-copyright">© 2024 Cook Is Easy. Made with 🧡 for home cooks everywhere.</p>
+          <p className="footer-copyright">© 2024 Fridgely. Made with 🧡 for home cooks everywhere.</p>
         </div>
       </footer>
 

@@ -26,7 +26,7 @@ export function Header({ user, onLogout }: HeaderProps) {
           >
             <span className="text-2xl">🍳</span>
             <span className="font-serif font-semibold text-xl text-foreground hidden sm:inline">
-              Cook Is Easy
+              Fridgely
             </span>
           </button>
 

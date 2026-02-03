@@ -1,4 +1,4 @@
-# Project: Cook Is Easy - Recipe Search App
+# Project: Fridgely - Recipe Search App
 
 ## Auto-Agent Orchestration
 

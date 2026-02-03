@@ -1,4 +1,4 @@
-// Cook Is Easy - Ad Video Design System
+// Fridgely - Ad Video Design System
 
 export const colors = {
   // Primary
@@ -78,10 +78,10 @@ export const videoConfig = {
 export const sceneTiming = {
   hook: { start: 0, end: 3 },        // "7 вечера. Открываешь холодильник..."
   problem: { start: 3, end: 10 },    // "...и понятия не имеешь..." + "Знакомо?"
-  solution: { start: 10, end: 18 },  // "Забудь про это. Открой Cook Is Easy"
+  solution: { start: 10, end: 18 },  // "Забудь про это. Открой Fridgely"
   demo: { start: 18, end: 32 },      // "Нажми поиск... Бам! 47 рецептов"
   result: { start: 32, end: 40 },    // "Через полчаса... Ужин готов"
-  cta: { start: 40, end: 45 },       // "Cook Is Easy. Скачай бесплатно"
+  cta: { start: 40, end: 45 },       // "Fridgely. Скачай бесплатно"
 };
 
 // Legacy phase timings (for backward compatibility)
